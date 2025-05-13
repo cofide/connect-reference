@@ -1,0 +1,5 @@
+cofidectl
+cofidectl.sh
+cofide.yaml
+*.sha256
+generated/*
