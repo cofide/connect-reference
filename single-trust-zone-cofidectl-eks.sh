@@ -19,7 +19,7 @@ source eks.env
 
 # Create an EBS storageclass for SPIRE server.
 
-AWS_REGION=eu-west-1 envsubst <ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
+AWS_REGION=eu-west-1 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
 kubectl --context $USER_K8S_CLUSTER_CONTEXT apply -f generated/ebs-storageclass.yaml
 
 ## cofidectl_up.sh

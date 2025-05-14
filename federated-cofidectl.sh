@@ -38,7 +38,7 @@ kind delete cluster --name $USER_K8S_CLUSTER_NAME_2
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < kind_user_config_template.yaml > generated/kind_user_config.yaml
+envsubst < templates/kind_user_config_template.yaml > generated/kind_user_config.yaml
 kind create cluster --name $USER_K8S_CLUSTER_NAME_1 --config generated/kind_user_config.yaml
 kind create cluster --name $USER_K8S_CLUSTER_NAME_2 --config generated/kind_user_config.yaml
 

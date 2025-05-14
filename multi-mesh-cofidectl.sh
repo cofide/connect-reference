@@ -43,7 +43,7 @@ kind delete cluster --name $USER_K8S_CLUSTER_NAME_2
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < kind_user_config_template.yaml > generated/kind_user_config.yaml
+envsubst <templates/kind_user_config_template.yaml >generated/kind_user_config.yaml
 kind create cluster --name $USER_K8S_CLUSTER_NAME_1 --config generated/kind_user_config.yaml
 kind create cluster --name $USER_K8S_CLUSTER_NAME_2 --config generated/kind_user_config.yaml
 
@@ -55,13 +55,13 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 export HOST_TRUST_DOMAIN=$USER_TRUST_DOMAIN_1
 export OTHER_TRUST_DOMAINS="[$USER_TRUST_DOMAIN_2]"
 export CLUSTER=$USER_K8S_CLUSTER_NAME_1
-envsubst <istio-meshconfig-template.yaml >generated/istio-meshconfig-$USER_TRUST_ZONE_1.yaml
+envsubst <templates/istio-meshconfig-template.yaml >generated/istio-meshconfig-$USER_TRUST_ZONE_1.yaml
 istioctl install --skip-confirmation -f generated/istio-meshconfig-$USER_TRUST_ZONE_1.yaml --context $USER_K8S_CLUSTER_CONTEXT_1
 
 export HOST_TRUST_DOMAIN=$USER_TRUST_DOMAIN_2
 export OTHER_TRUST_DOMAINS="[$USER_TRUST_DOMAIN_1]"
 export CLUSTER=$USER_K8S_CLUSTER_NAME_2
-envsubst <istio-meshconfig-template.yaml >generated/istio-meshconfig-$USER_TRUST_ZONE_2.yaml
+envsubst <templates/istio-meshconfig-template.yaml >generated/istio-meshconfig-$USER_TRUST_ZONE_2.yaml
 istioctl install --skip-confirmation -f generated/istio-meshconfig-$USER_TRUST_ZONE_2.yaml --context $USER_K8S_CLUSTER_CONTEXT_2
 
 ## cofidectl_up.sh
@@ -115,7 +115,7 @@ cofidectl up --trust-zone $USER_TRUST_ZONE_1 --trust-zone $USER_TRUST_ZONE_2
 
 # Create an Istio gateway.
 
-SERVER_TRUST_ZONE=$USER_TRUST_ZONE_1 envsubst <gateway-template.yaml >generated/gateway.yaml
+SERVER_TRUST_ZONE=$USER_TRUST_ZONE_1 envsubst <templates/gateway-template.yaml >generated/gateway.yaml
 kubectl apply -f generated/gateway.yaml --context $USER_K8S_CLUSTER_CONTEXT_1
 
 # Create a federated service.
@@ -125,7 +125,7 @@ export FEDERATED_SERVICE_NAME=server
 export CLIENT_TRUST_ZONE=$USER_TRUST_ZONE_2
 export WORKLOAD_LABEL_APP=ping-pong-server
 export SERVER_PORT=8443
-envsubst <federated-service-template.yaml >generated/federated-service.yaml
+envsubst <templates/federated-service-template.yaml >generated/federated-service.yaml
 kubectl --context $USER_K8S_CLUSTER_CONTEXT_1 apply -f generated/federated-service.yaml
 
 ## create_namespace.sh
