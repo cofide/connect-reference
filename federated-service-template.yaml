@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "${NAMESPACE}"
+  labels:
+    name: "${NAMESPACE}"
+---
+apiVersion: registry.cofide.io/v1alpha1
+kind: FederatedService
+metadata:
+  name: demo
+  namespace: "${NAMESPACE}"
+spec:
+  name: ${FEDERATED_SERVICE_NAME}
+  namespace: "${NAMESPACE}"
+  exportedTrustDomains: ["${CLIENT_TRUST_ZONE}.test"]
+  workloadLabels:
+    app: ${WORKLOAD_LABEL_APP}
+  port: ${SERVER_PORT}

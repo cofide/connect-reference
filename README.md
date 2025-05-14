@@ -33,3 +33,13 @@ Validates the deployment with federated ping-pong.
 ```sh
 ./federated-cofidectl.sh
 ```
+
+## Multi-mesh with cofidectl
+
+Run this script to deploy two federated trust zones in Kind clusters with Istio using cofidectl.
+An Istio gateway and a Cofide Federated Service are created in one of the clusters.
+Validates the deployment with multi-mesh ping-pong.
+
+```sh
+./multi-mesh-cofidectl.sh
+```

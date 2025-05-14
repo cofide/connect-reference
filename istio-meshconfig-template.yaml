@@ -1,0 +1,64 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+spec:
+  profile: default
+  meshConfig:
+    trustDomain: ${HOST_TRUST_DOMAIN}
+    caCertificates:
+      - trustDomains: ${OTHER_TRUST_DOMAINS}
+  values:
+    global:
+      network: ${HOST_TRUST_DOMAIN}
+      multiCluster:
+        clusterName: ${CLUSTER}
+    gateways:
+      istio-ingressgateway:
+        injectionTemplate: gateway
+    sidecarInjectorWebhook:
+      templates:
+        spire: |
+          spec:
+            containers:
+            - name: istio-proxy
+              volumeMounts:
+              - name: workload-socket
+                mountPath: /run/secrets/workload-spiffe-uds
+                readOnly: true
+            volumes:
+              - name: workload-socket
+                csi:
+                  driver: "csi.spiffe.io"
+                  readOnly: true
+  components:
+    ingressGateways:
+      - name: istio-eastwestgateway
+        label:
+          istio: eastwestgateway
+          app: istio-eastwestgateway
+          topology.istio.io/network: ${HOST_TRUST_DOMAIN}
+        enabled: true
+        k8s:
+          env:
+          - name: ISTIO_META_REQUESTED_NETWORK_VIEW
+            value: ${HOST_TRUST_DOMAIN}
+          service:
+            ports:
+            - name: status-port
+              port: 15021
+              targetPort: 15021
+            - name: tls
+              port: 15443
+              targetPort: 15443
+            - name: tls-istiod
+              port: 15012
+              targetPort: 15012
+            - name: tls-webhook
+              port: 15017
+              targetPort: 15017
+      - name: istio-ingressgateway
+        enabled: true
+        label:
+          istio: ingressgateway
+          topology.istio.io/network: ${HOST_TRUST_DOMAIN}
