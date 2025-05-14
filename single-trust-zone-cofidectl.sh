@@ -8,13 +8,9 @@ set -euxo pipefail
 
 # Prerequisites: ./prerequisites.sh
 
-NAMESPACE=production
+source config.env
 
 ## deploy_user.sh
-
-CONNECT_URL="stg.cofide.dev:8443"
-CONNECT_TRUST_DOMAIN="stg.cofide.dev"
-CONNECT_BUNDLE_HOST="federate.stg.cofide.dev"
 
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
@@ -43,6 +39,8 @@ cofidectl connect init \
   --connect-url $CONNECT_URL \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
+  --authorization-domain $AUTHORIZATION_DOMAIN \
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
   --connect-datasource
 
 cofidectl trust-zone add \

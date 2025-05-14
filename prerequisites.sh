@@ -4,8 +4,13 @@
 
 set -euxo pipefail
 
-if ! ./cofidectl connect login --check; then
-  ./cofidectl connect login
+if ! type cofidectl; then
+  echo "Unable to find cofidectl"
+  exit 1
+fi
+
+if ! cofidectl connect login --check; then
+  cofidectl connect login
 fi
 
 if ! aws sts get-caller-identity; then
