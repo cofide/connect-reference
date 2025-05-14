@@ -1,0 +1,7 @@
+aws_region = "<region>"
+cluster_names = ["<cluster name>"]
+admin_access_role = "AWSReservedSSO_AdministratorAccess_<get this ID from your roles>"
+developer_access_role = "AWSReservedSSO_DeveloperAccess_<get this ID from your roles>"
+eks_node_group_capacity_type = "SPOT"
+oidc_provider_client_id = "<OIDC provider client ID>"
+oidc_provider_issuer_url = "<OIDC provider issuer URL>"

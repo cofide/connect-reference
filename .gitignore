@@ -6,4 +6,4 @@ generated/*
 terraform.tfstate
 terraform.tfvars
 .terraform
-eks.env
+*.env
