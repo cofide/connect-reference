@@ -3,3 +3,7 @@ cofidectl.sh
 cofide.yaml
 *.sha256
 generated/*
+terraform.tfstate
+terraform.tfvars
+.terraform
+eks.env

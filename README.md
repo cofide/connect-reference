@@ -43,3 +43,12 @@ Validates the deployment with multi-mesh ping-pong.
 ```sh
 ./multi-mesh-cofidectl.sh
 ```
+
+## Single trust zone with cofidectl on EKS
+
+Run this script to deploy a single trust zone in an existing AWS EKS cluster using cofidectl.
+Validates the deployment with ping-pong.
+
+```sh
+./single-trust-zone-cofidectl-eks.sh
+```
