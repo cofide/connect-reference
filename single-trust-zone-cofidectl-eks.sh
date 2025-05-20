@@ -57,7 +57,7 @@ kubectl --context $USER_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
 SERVER_CTX=$USER_K8S_CLUSTER_CONTEXT
 CLIENT_CTX=$USER_K8S_CLUSTER_CONTEXT
 
-export IMAGE_TAG=v0.1.3 # Version of cofide-demos to use
+export IMAGE_TAG=v0.1.10 # Version of cofide-demos to use
 COFIDE_DEMOS_BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"
 
 SERVER_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-server/deploy.yaml"
