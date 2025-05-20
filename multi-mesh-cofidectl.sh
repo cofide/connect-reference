@@ -16,7 +16,7 @@ if ! command -v $HOME/.istioctl/bin/istioctl && ! type istioctl; then
   export PATH=$HOME/.istioctl/bin:$PATH
 fi
 
-## deploy_user.sh
+## Deploy workload clusters
 
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
@@ -47,7 +47,7 @@ envsubst <templates/kind_user_config_template.yaml >generated/kind_user_config.y
 kind create cluster --name $USER_K8S_CLUSTER_NAME_1 --config generated/kind_user_config.yaml
 kind create cluster --name $USER_K8S_CLUSTER_NAME_2 --config generated/kind_user_config.yaml
 
-## install_istio.sh
+## Install Istio
 
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml --context $USER_K8S_CLUSTER_CONTEXT_1
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml --context $USER_K8S_CLUSTER_CONTEXT_2
@@ -64,7 +64,7 @@ export CLUSTER=$USER_K8S_CLUSTER_NAME_2
 envsubst <templates/istio-meshconfig-template.yaml >generated/istio-meshconfig-$USER_TRUST_ZONE_2.yaml
 istioctl install --skip-confirmation -f generated/istio-meshconfig-$USER_TRUST_ZONE_2.yaml --context $USER_K8S_CLUSTER_CONTEXT_2
 
-## cofidectl_up.sh
+## Deploy workload identity infrastructure using cofidectl
 
 rm -f cofide.yaml
 cofidectl connect init \
@@ -128,11 +128,9 @@ export SERVER_PORT=8443
 envsubst <templates/federated-service-template.yaml >generated/federated-service.yaml
 kubectl --context $USER_K8S_CLUSTER_CONTEXT_1 apply -f generated/federated-service.yaml
 
-## create_namespace.sh
+## Validate the deployment using ping-pong demo
 
 kubectl --context $USER_K8S_CLUSTER_CONTEXT_2 create namespace $NAMESPACE
-
-## deploy_ping_pong.sh
 
 SERVER_CTX=$USER_K8S_CLUSTER_CONTEXT_1
 CLIENT_CTX=$USER_K8S_CLUSTER_CONTEXT_2

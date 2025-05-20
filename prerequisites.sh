@@ -4,10 +4,12 @@
 
 set -euxo pipefail
 
-if ! type cofidectl; then
-  echo "Unable to find cofidectl"
-  exit 1
-fi
+for cmd in aws cofidectl curl docker helm kind kubectl uuidgen; do
+  if ! type $cmd; then
+    echo "Unable to find $cmd"
+    exit 1
+  fi
+done
 
 if ! cofidectl connect login --check; then
   cofidectl connect login

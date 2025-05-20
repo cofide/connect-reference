@@ -11,7 +11,7 @@ set -euxo pipefail
 
 source config.env
 
-## deploy_user.sh
+## Deploy workload cluster
 
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
@@ -42,7 +42,7 @@ envsubst < templates/kind_user_config_template.yaml > generated/kind_user_config
 kind create cluster --name $USER_K8S_CLUSTER_NAME_1 --config generated/kind_user_config.yaml
 kind create cluster --name $USER_K8S_CLUSTER_NAME_2 --config generated/kind_user_config.yaml
 
-## cofidectl_up.sh
+## Deploy workload identity infrastructure using cofidectl
 
 rm -f cofide.yaml
 cofidectl connect init \
@@ -91,12 +91,10 @@ cofidectl attestation-policy-binding add \
 
 cofidectl up --trust-zone $USER_TRUST_ZONE_1 --trust-zone $USER_TRUST_ZONE_2
 
-## create_namespace.sh
+## Validate the deployment using ping-pong demo
 
 kubectl --context $USER_K8S_CLUSTER_CONTEXT_1 create namespace $NAMESPACE
 kubectl --context $USER_K8S_CLUSTER_CONTEXT_2 create namespace $NAMESPACE
-
-## deploy_ping_pong.sh
 
 SERVER_CTX=$USER_K8S_CLUSTER_CONTEXT_1
 CLIENT_CTX=$USER_K8S_CLUSTER_CONTEXT_2

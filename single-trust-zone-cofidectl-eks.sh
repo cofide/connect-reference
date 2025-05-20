@@ -10,7 +10,7 @@ set -euxo pipefail
 
 source config.env
 
-## deploy_user.sh
+## Deploy workload cluster
 
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
@@ -22,7 +22,7 @@ source eks.env
 AWS_REGION=eu-west-1 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
 kubectl --context $USER_K8S_CLUSTER_CONTEXT apply -f generated/ebs-storageclass.yaml
 
-## cofidectl_up.sh
+## Deploy workload identity infrastructure using cofidectl
 
 rm -f cofide.yaml
 cofidectl connect init \
@@ -50,11 +50,9 @@ cofidectl attestation-policy-binding add \
 
 cofidectl up --trust-zone $USER_TRUST_ZONE
 
-## create_namespace.sh
+## Validate the deployment using ping-pong demo
 
 kubectl --context $USER_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
-
-## deploy_ping_pong.sh
 
 SERVER_CTX=$USER_K8S_CLUSTER_CONTEXT
 CLIENT_CTX=$USER_K8S_CLUSTER_CONTEXT
