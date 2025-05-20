@@ -15,22 +15,22 @@ source config.env
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
 
-USER_K8S_CLUSTER_NAME="${USER_K8S_CLUSTER_NAME:-user-${UNIQUE_ID}}"
-USER_K8S_CLUSTER_CONTEXT="${USER_K8S_CLUSTER_CONTEXT:-kind-user-${UNIQUE_ID}}"
+WORKLOAD_K8S_CLUSTER_NAME="${WORKLOAD_K8S_CLUSTER_NAME:-workload-${UNIQUE_ID}}"
+WORKLOAD_K8S_CLUSTER_CONTEXT="${WORKLOAD_K8S_CLUSTER_CONTEXT:-kind-workload-${UNIQUE_ID}}"
 # Trust zones must be unique within a single Cofide Connect service.
-USER_TRUST_ZONE=${USER_TRUST_ZONE:-${UNIQUE_ID}}
+WORKLOAD_TRUST_ZONE=${WORKLOAD_TRUST_ZONE:-${UNIQUE_ID}}
 # Trust domains must currently be globally unique due to a shared S3 bucket for hosting bundles.
-USER_TRUST_DOMAIN=${USER_TRUST_DOMAIN:-${UNIQUE_ID}.test}
+WORKLOAD_TRUST_DOMAIN=${WORKLOAD_TRUST_DOMAIN:-${UNIQUE_ID}.test}
 
-kind delete cluster --name $USER_K8S_CLUSTER_NAME
+kind delete cluster --name $WORKLOAD_K8S_CLUSTER_NAME
 
 # Patch in host Docker config in order to enable pulling images
 # to the Kind cluster. This envsubst approach is required as Kind does
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < templates/kind_user_config_template.yaml > generated/kind_user_config.yaml
-kind create cluster --name $USER_K8S_CLUSTER_NAME --config generated/kind_user_config.yaml
+envsubst < templates/kind_workload_config_template.yaml > generated/kind_workload_config.yaml
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME --config generated/kind_workload_config.yaml
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -44,28 +44,28 @@ cofidectl connect init \
   --connect-datasource
 
 cofidectl trust-zone add \
-  $USER_TRUST_ZONE \
-  --trust-domain $USER_TRUST_DOMAIN \
-  --kubernetes-cluster $USER_K8S_CLUSTER_NAME \
-  --kubernetes-context $USER_K8S_CLUSTER_CONTEXT \
+  $WORKLOAD_TRUST_ZONE \
+  --trust-domain $WORKLOAD_TRUST_DOMAIN \
+  --kubernetes-cluster $WORKLOAD_K8S_CLUSTER_NAME \
+  --kubernetes-context $WORKLOAD_K8S_CLUSTER_CONTEXT \
   --profile kubernetes
 
 cofidectl attestation-policy add kubernetes \
-  --name $NAMESPACE-ns-$USER_TRUST_ZONE \
+  --name $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE \
   --namespace $NAMESPACE
 
 cofidectl attestation-policy-binding add \
-  --trust-zone $USER_TRUST_ZONE \
-  --attestation-policy $NAMESPACE-ns-$USER_TRUST_ZONE
+  --trust-zone $WORKLOAD_TRUST_ZONE \
+  --attestation-policy $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE
 
-cofidectl up --trust-zone $USER_TRUST_ZONE
+cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE
 
 ## Validate the deployment using ping-pong demo
 
-kubectl --context $USER_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
 
-SERVER_CTX=$USER_K8S_CLUSTER_CONTEXT
-CLIENT_CTX=$USER_K8S_CLUSTER_CONTEXT
+SERVER_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT
+CLIENT_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT
 
 export IMAGE_TAG=v0.1.10 # Version of cofide-demos to use
 COFIDE_DEMOS_BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"
