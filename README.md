@@ -2,12 +2,20 @@
 
 This repository contains scripts and configuration to create reference deployments of Connect workload clusters.
 
-## Prerequisites
+## Access requirements
 
-Run this script before any others to perform checks and logins:
-```sh
-./prerequisites.sh
-```
+In order to run these reference deployments, you will need the following information:
+
+- Access to a Cofide Connect API
+  - Connect API URL
+  - Connect trust domain
+  - Connect bundle host
+- Connect API login
+  - OIDC authorization domain and client ID
+- AWS credentials
+  - Authorized for access to Cofide Elastic Container Registry (ECR) repositories
+
+The scripts use the [aws](https://aws.amazon.com/cli/) CLI to obtain credentials for Docker and Helm to access ECR.
 
 ## Configuration
 
@@ -41,6 +49,13 @@ Edit `eks.env` to populate the variables for your EKS cluster.
 Run this script to download cofidectl and the Connect plugin:
 ```sh
 ./get-cofidectl.sh
+```
+
+## Prerequisites
+
+Run this script before any others to perform checks and logins:
+```sh
+./prerequisites.sh
 ```
 
 ## Single trust zone with cofidectl
