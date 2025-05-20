@@ -20,7 +20,7 @@ source eks.env
 # Create an EBS storageclass for SPIRE server.
 
 AWS_REGION=eu-west-1 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
-kubectl --context $USER_K8S_CLUSTER_CONTEXT apply -f generated/ebs-storageclass.yaml
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT apply -f generated/ebs-storageclass.yaml
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -34,28 +34,28 @@ cofidectl connect init \
   --connect-datasource
 
 cofidectl trust-zone add \
-  $USER_TRUST_ZONE \
-  --trust-domain $USER_TRUST_DOMAIN \
-  --kubernetes-cluster $USER_K8S_CLUSTER_NAME \
-  --kubernetes-context $USER_K8S_CLUSTER_CONTEXT \
+  $WORKLOAD_TRUST_ZONE \
+  --trust-domain $WORKLOAD_TRUST_DOMAIN \
+  --kubernetes-cluster $WORKLOAD_K8S_CLUSTER_NAME \
+  --kubernetes-context $WORKLOAD_K8S_CLUSTER_CONTEXT \
   --profile kubernetes
 
 cofidectl attestation-policy add kubernetes \
-  --name $NAMESPACE-ns-$USER_TRUST_ZONE \
+  --name $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE \
   --namespace $NAMESPACE
 
 cofidectl attestation-policy-binding add \
-  --trust-zone $USER_TRUST_ZONE \
-  --attestation-policy $NAMESPACE-ns-$USER_TRUST_ZONE
+  --trust-zone $WORKLOAD_TRUST_ZONE \
+  --attestation-policy $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE
 
-cofidectl up --trust-zone $USER_TRUST_ZONE
+cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE
 
 ## Validate the deployment using ping-pong demo
 
-kubectl --context $USER_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
 
-SERVER_CTX=$USER_K8S_CLUSTER_CONTEXT
-CLIENT_CTX=$USER_K8S_CLUSTER_CONTEXT
+SERVER_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT
+CLIENT_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT
 
 export IMAGE_TAG=v0.1.10 # Version of cofide-demos to use
 COFIDE_DEMOS_BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"
