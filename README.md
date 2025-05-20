@@ -1,6 +1,6 @@
 # Connect Reference
 
-This repository contains reference deployments for Connect workload clusters.
+This repository contains scripts and configuration to create reference deployments of Connect workload clusters.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ Edit `eks.env` to populate the variables for your EKS cluster.
 ## Download cofidectl and Connect plugin
 
 Run this script to download cofidectl and the Connect plugin:
-```
+```sh
 ./get-cofidectl.sh
 ```
 
@@ -73,7 +73,8 @@ Validates the deployment with multi-mesh ping-pong.
 
 ## Single trust zone with cofidectl on EKS
 
-This script requires an AWS EKS cluster. A Terraform configration is provided in `terraform/eks-clusters` that may be used to provision one.
+This script requires an AWS EKS cluster.
+Use your own EKS cluster or use the Terraform configration in `terraform/eks-clusters` to provision one.
 
 Run this script to deploy a single trust zone in an existing AWS EKS cluster using cofidectl.
 Validates the deployment with ping-pong.
