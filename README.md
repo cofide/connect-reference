@@ -28,6 +28,8 @@ Edit `config.env` to populate the variables for your Connect API.
 
 ### EKS
 
+NOTE: The provided Terraform configuration for creating an EKS cluster uses a module that is currently private to Cofide. It is possible to use an existing EKS cluster.
+
 Skip this section if not running scripts that execute against AWS EKS.
 
 Create a `terraform.tfvars` file from the example:
