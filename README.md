@@ -17,6 +17,21 @@ In order to run these reference deployments, you will need the following informa
 
 The scripts use the [aws](https://aws.amazon.com/cli/) CLI to obtain credentials for Docker and Helm to access ECR.
 
+## Software Requirements
+
+You will also need the following software installed on the machine running the deployments:
+
+- [aws CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
+- [curl](https://curl.se/)
+- [docker](https://docs.docker.com/engine/install/)
+- [Helm](https://helm.sh/docs/intro/install/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [uuidgen](https://man7.org/linux/man-pages/man1/uuidgen.1.html)
+
+If running the local Kind-based deployments you will also need:
+
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/)
+
 ## Configuration
 
 Create a `config.env` file from the example:

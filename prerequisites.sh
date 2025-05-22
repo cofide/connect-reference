@@ -6,7 +6,7 @@ set -euxo pipefail
 
 source config.env
 
-for cmd in aws cofidectl curl docker helm kind kubectl uuidgen; do
+for cmd in aws cofidectl curl docker helm kubectl uuidgen; do
   if ! type $cmd; then
     echo "Unable to find $cmd"
     exit 1
