@@ -93,6 +93,12 @@ Validates the deployment with federated ping-pong.
 ./federated-cofidectl.sh
 ```
 
+A corresponding script that uses the Cofide Terraform provider in conjunction with cofidectl can be run using:
+
+```sh
+./single-trust-zone-cofidectl-tf.sh
+```
+
 ## Multi-mesh with cofidectl
 
 Run this script to deploy two federated trust zones in Kind clusters with Istio using cofidectl.
