@@ -5,7 +5,7 @@ variable "trust_zone_name" {
 
 variable "trust_domain" {
   type        = string
-  description = "The trust domain associated with the left trust zone."
+  description = "The trust domain associated with the trust zone."
 }
 
 variable "cluster_name" {
