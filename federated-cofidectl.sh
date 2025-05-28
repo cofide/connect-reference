@@ -122,5 +122,5 @@ if ! curl --fail $CLIENT_MANIFEST | envsubst | kubectl apply --context "$CLIENT_
 fi
 echo "Client deployment complete"
 
-kubectl --context $CLIENT_CTX wait -n $NAMESPACE --for=condition=Available --timeout 60s deployments/ping-pong-client
+kubectl --context $CLIENT_CTX wait -n $NAMESPACE --for=condition=Available --timeout 120s deployments/ping-pong-client
 kubectl --context $CLIENT_CTX logs -n $NAMESPACE deployments/ping-pong-client -f
