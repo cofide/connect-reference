@@ -55,7 +55,7 @@ set -x
 export COFIDE_CONNECT_URL="${CONNECT_URL}"
 
 # Set this to true if running against a local instance of Connect.
-export COFIDE_INSECURE_SKIP_VERIFY=true
+export COFIDE_INSECURE_SKIP_VERIFY=false
 
 export TF_VAR_trust_zone_name="${WORKLOAD_TRUST_ZONE}"
 export TF_VAR_trust_domain="${WORKLOAD_TRUST_DOMAIN}"
