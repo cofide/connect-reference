@@ -95,16 +95,15 @@ export TF_VAR_trust_domain_1="${WORKLOAD_TRUST_DOMAIN_1}"
 export TF_VAR_cluster_1_name="${WORKLOAD_K8S_CLUSTER_NAME_1}"
 export TF_VAR_cluster_1_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_1}"
 export TF_VAR_cluster_1_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml)"
-export TF_VAR_attestation_policy_1_name="${NAMESPACE}-ns-${WORKLOAD_TRUST_ZONE_1}"
-export TF_VAR_attestation_policy_1_namespace="${NAMESPACE}"
+
+export TF_VAR_attestation_policy_name="${NAMESPACE}-ns-${UNIQUE_ID}"
+export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
 export TF_VAR_trust_zone_2_name="${WORKLOAD_TRUST_ZONE_2}"
 export TF_VAR_trust_domain_2="${WORKLOAD_TRUST_DOMAIN_2}"
 export TF_VAR_cluster_2_name="${WORKLOAD_K8S_CLUSTER_NAME_2}"
 export TF_VAR_cluster_2_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml)"
 export TF_VAR_cluster_2_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_2}"
-export TF_VAR_attestation_policy_name="${NAMESPACE}-ns-${UNIQUE_ID}"
-export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
 terraform -chdir=./terraform/federated init -input=false -backend=false
 
