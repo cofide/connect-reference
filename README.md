@@ -93,7 +93,7 @@ Validates the deployment with federated ping-pong.
 ./federated-cofidectl.sh
 ```
 
-A corresponding script that uses the Cofide Terraform provider in conjunction with cofidectl can be run using:
+A corresponding script that uses cofidectl and terraform-provide-cofide, with the Cofide trust zone server can be run using:
 
 ```sh
 ./single-trust-zone-cofidectl-tf.sh

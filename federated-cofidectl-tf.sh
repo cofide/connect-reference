@@ -5,7 +5,7 @@ set -euxo pipefail
 # This script creates a pair of kind clusters and defines trust zones,
 # clusters, an attestation policy, bindings and federations in the staging
 # Connect using cofidectl and terraform-provider-cofide.
-# It then runs a ping-pong test between the trust zones.
+# It then runs a ping-pong test between the trust zones, each using the Cofide trust zone server.
 
 # Prerequisites: ./prerequisites.sh
 
