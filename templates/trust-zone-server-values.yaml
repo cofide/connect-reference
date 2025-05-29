@@ -1,0 +1,26 @@
+spire-server:
+  image:
+    registry: ${REGISTRY}
+    repository: ${REPOSITORY}
+    tag: ${TAG}
+  controllerManager:
+    enabled: false
+  extraEnv:
+    - name: DATASTORE
+      value: connect
+    - name: CLUSTER_NAME
+      value: ${CLUSTER_NAME}
+    - name: SPIRE_AGENT_NAMESPACE
+      value: spire-system
+    - name: SPIRE_AGENT_SERVICE_ACCOUNT
+      value: spire-agent
+    - name: TRUST_DOMAIN
+      value: ${TRUST_DOMAIN}
+    - name: COFIDE_CONNECT_URL
+      value: ${CONNECT_URL}
+    - name: COFIDE_CONNECT_TRUST_DOMAIN
+      value: ${CONNECT_TRUST_DOMAIN}
+    - name: COFIDE_CONNECT_BUNDLE_ENDPOINT_URL
+      value: ${CONNECT_BUNDLE_ENDPOINT_URL}
+  federation:
+    enabled: true
