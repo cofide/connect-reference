@@ -55,13 +55,13 @@ set -x
 export COFIDE_CONNECT_URL="${CONNECT_URL}"
 
 # Set this to true if running against a local instance of Connect.
-export COFIDE_INSECURE_SKIP_VERIFY=true
+export COFIDE_INSECURE_SKIP_VERIFY=false
 
 export TF_VAR_trust_zone_name="${WORKLOAD_TRUST_ZONE}"
 export TF_VAR_trust_domain="${WORKLOAD_TRUST_DOMAIN}"
 export TF_VAR_cluster_name="${WORKLOAD_K8S_CLUSTER_NAME}"
 export TF_VAR_cluster_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT}"
-export TF_VAR_attestation_policy_name="${NAMESPACE-ns-$WORKLOAD_TRUST_ZONE}"
+export TF_VAR_attestation_policy_name="${NAMESPACE}-ns-${WORKLOAD_TRUST_ZONE}"
 export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
 terraform -chdir=./terraform/single-trust-zone init -input=false -backend=false
