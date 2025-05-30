@@ -15,7 +15,7 @@ source config.env
 
 export REGISTRY=010438484483.dkr.ecr.eu-west-1.amazonaws.com
 export REPOSITORY=cofide/trust-zone-server
-export TAG=v1.10.9
+export TAG=v1.10.11
 export CONNECT_URL=$CONNECT_URL
 export CONNECT_TRUST_DOMAIN=$CONNECT_TRUST_DOMAIN
 
