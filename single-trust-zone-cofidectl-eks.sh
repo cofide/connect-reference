@@ -12,15 +12,12 @@ source config.env
 
 ## Deploy workload cluster
 
-# Generate unique ID for cluster, trust zone & trust domain disambiguation
-UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
-
 source eks.env
 
 # Create an EBS storageclass for SPIRE server.
 
-AWS_REGION=eu-west-1 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT apply -f generated/ebs-storageclass.yaml
+envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 apply -f generated/ebs-storageclass.yaml
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -34,28 +31,28 @@ cofidectl connect init \
   --connect-datasource
 
 cofidectl trust-zone add \
-  $WORKLOAD_TRUST_ZONE \
-  --trust-domain $WORKLOAD_TRUST_DOMAIN \
-  --kubernetes-cluster $WORKLOAD_K8S_CLUSTER_NAME \
-  --kubernetes-context $WORKLOAD_K8S_CLUSTER_CONTEXT \
+  $WORKLOAD_TRUST_ZONE_1 \
+  --trust-domain $WORKLOAD_TRUST_DOMAIN_1 \
+  --kubernetes-cluster $WORKLOAD_K8S_CLUSTER_NAME_1 \
+  --kubernetes-context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 \
   --profile kubernetes
 
 cofidectl attestation-policy add kubernetes \
-  --name $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE \
+  --name $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE_1 \
   --namespace $NAMESPACE
 
 cofidectl attestation-policy-binding add \
-  --trust-zone $WORKLOAD_TRUST_ZONE \
-  --attestation-policy $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE
+  --trust-zone $WORKLOAD_TRUST_ZONE_1 \
+  --attestation-policy $NAMESPACE-ns-$WORKLOAD_TRUST_ZONE_1
 
-cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE
+cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1
 
 ## Validate the deployment using ping-pong demo
 
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT create namespace $NAMESPACE
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 create namespace $NAMESPACE
 
-SERVER_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT
-CLIENT_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT
+SERVER_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT_1
+CLIENT_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT_1
 
 export IMAGE_TAG=v0.1.10 # Version of cofide-demos to use
 COFIDE_DEMOS_BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"

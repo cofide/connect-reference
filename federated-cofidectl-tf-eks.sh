@@ -13,6 +13,8 @@ source config.env
 
 ## Deploy workload cluster
 
+source eks.env
+
 export REGISTRY=010438484483.dkr.ecr.eu-west-1.amazonaws.com
 export REPOSITORY=cofide/trust-zone-server
 export TAG=v1.10.11
@@ -25,29 +27,15 @@ export CONNECT_BUNDLE_ENDPOINT_URL="https://$CONNECT_BUNDLE_HOST/$BUNDLE_ID/bund
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
 
-WORKLOAD_K8S_CLUSTER_NAME_1="workload-${UNIQUE_ID}-1"
-# Trust zones must be unique within a single Cofide Connect service.
-WORKLOAD_TRUST_ZONE_1="${UNIQUE_ID}-1"
-# Trust domains must currently be globally unique due to a shared S3 bucket for hosting bundles.
-WORKLOAD_TRUST_DOMAIN_1="${UNIQUE_ID}-1.test"
-
 export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_1
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_1
-
 envsubst < templates/trust-zone-server-values.yaml > generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml
-
-WORKLOAD_K8S_CLUSTER_NAME_2="workload-${UNIQUE_ID}-2"
-# Trust zones must be unique within a single Cofide Connect service.
-WORKLOAD_TRUST_ZONE_2="${UNIQUE_ID}-2"
-# Trust domains must currently be globally unique due to a shared S3 bucket for hosting bundles.
-WORKLOAD_TRUST_DOMAIN_2="${UNIQUE_ID}-2.test"
 
 export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_2
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_2
-
 envsubst < templates/trust-zone-server-values.yaml > generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml
 
-AWS_REGION=eu-west-1 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
+envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
 
 # Create an EBS storageclass in each EKS cluster for the associated trust zone server.
 kubectl apply -f generated/ebs-storageclass.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
@@ -87,14 +75,13 @@ export TF_VAR_trust_domain_1="${WORKLOAD_TRUST_DOMAIN_1}"
 export TF_VAR_cluster_1_name="${WORKLOAD_K8S_CLUSTER_NAME_1}"
 export TF_VAR_cluster_1_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_1}"
 export TF_VAR_cluster_1_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml)"
-export TF_VAR_attestation_policy_1_name="${NAMESPACE-ns-$WORKLOAD_TRUST_ZONE_1}"
-export TF_VAR_attestation_policy_1_namespace="${NAMESPACE}"
 
 export TF_VAR_trust_zone_2_name="${WORKLOAD_TRUST_ZONE_2}"
 export TF_VAR_trust_domain_2="${WORKLOAD_TRUST_DOMAIN_2}"
 export TF_VAR_cluster_2_name="${WORKLOAD_K8S_CLUSTER_NAME_2}"
-export TF_VAR_cluster_2_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml)"
 export TF_VAR_cluster_2_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_2}"
+export TF_VAR_cluster_2_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml)"
+
 export TF_VAR_attestation_policy_name="${NAMESPACE-ns-$UNIQUE_ID}"
 export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
