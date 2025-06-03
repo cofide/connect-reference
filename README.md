@@ -84,6 +84,12 @@ Validates the deployment with ping-pong.
 ./single-trust-zone-cofidectl.sh
 ```
 
+A corresponding script that uses cofidectl and [terraform-provider-cofide](https://registry.terraform.io/providers/cofide/cofide/latest/docs) can be run using:
+
+```sh
+./single-trust-zone-cofidectl-tf.sh
+```
+
 ## Federated trust zones with cofidectl
 
 Run this script to deploy two federated trust zones in Kind clusters using cofidectl.
@@ -93,10 +99,10 @@ Validates the deployment with federated ping-pong.
 ./federated-cofidectl.sh
 ```
 
-A corresponding script that uses cofidectl and terraform-provide-cofide, with the Cofide trust zone server can be run using:
+A corresponding script that uses cofidectl and [terraform-provider-cofide](https://registry.terraform.io/providers/cofide/cofide/latest/docs), with the Cofide trust zone server can be run using:
 
 ```sh
-./single-trust-zone-cofidectl-tf.sh
+./federated-cofidectl-tf.sh
 ```
 
 ## Multi-mesh with cofidectl

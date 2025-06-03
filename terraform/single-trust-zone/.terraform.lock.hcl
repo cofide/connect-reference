@@ -5,6 +5,7 @@ provider "registry.terraform.io/cofide/cofide" {
   version     = "0.4.0"
   constraints = "0.4.0"
   hashes = [
+    "h1:8XocHPlHRn5x7eEJg3Ps4IcrG8acwXqlz2JLFG7BH4E=",
     "h1:a1AAE2NKud3yulrDRN95ah+p/x8JBhtPr+CCyoHFqDc=",
     "zh:1962b9d81ca21be70b2c94fe4b02c55c0739c4d09c94103bca2f24e9f1e222c0",
     "zh:3d3189e7594fad1b5ecf110b5c4ec802de9f1328487eec106408cecf0ba70284",
