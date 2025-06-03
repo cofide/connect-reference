@@ -4,6 +4,7 @@ cofide.yaml
 *.sha256
 generated/*
 terraform.tfstate
+terraform.tfstate.backup
 terraform.tfvars
 .terraform
 *.env
