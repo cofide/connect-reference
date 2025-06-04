@@ -35,6 +35,7 @@ export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_2
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_2
 envsubst < templates/trust-zone-server-values.yaml > generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml
 
+export AWS_REGION
 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
 
 # Create an EBS storageclass in each EKS cluster for the associated trust zone server.

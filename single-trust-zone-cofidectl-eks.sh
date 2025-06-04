@@ -16,6 +16,7 @@ source eks.env
 
 # Create an EBS storageclass for SPIRE server.
 
+export AWS_REGION
 envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
 kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 apply -f generated/ebs-storageclass.yaml
 
