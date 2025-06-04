@@ -50,29 +50,4 @@ cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1
 
 ## Validate the deployment using ping-pong demo
 
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 create namespace $NAMESPACE
-
-SERVER_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT_1
-CLIENT_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT_1
-
-export IMAGE_TAG=v0.1.10 # Version of cofide-demos to use
-COFIDE_DEMOS_BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"
-
-SERVER_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-server/deploy.yaml"
-export PING_PONG_SERVER_SERVICE_PORT=8443
-if ! curl --fail $SERVER_MANIFEST | envsubst | kubectl apply -n "$NAMESPACE" --context "$SERVER_CTX" -f -; then
-  echo "Error: Server deployment failed" >&2
-  exit 1
-fi
-echo "Server deployment complete"
-
-export PING_PONG_SERVER_SERVICE_HOST=ping-pong-server
-CLIENT_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-client/deploy.yaml"
-if ! curl --fail $CLIENT_MANIFEST | envsubst | kubectl apply --context "$CLIENT_CTX" -n "$NAMESPACE" -f -; then
-  echo "Error: client deployment failed" >&2
-  exit 1
-fi
-echo "Client deployment complete"
-
-kubectl --context $CLIENT_CTX wait -n $NAMESPACE --for=condition=Available --timeout 60s deployments/ping-pong-client
-kubectl --context $CLIENT_CTX logs -n $NAMESPACE deployments/ping-pong-client -f
+./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1

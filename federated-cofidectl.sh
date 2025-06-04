@@ -93,34 +93,4 @@ cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1 --trust-zone $WORKLOAD_TRUST_ZO
 
 ## Validate the deployment using ping-pong demo
 
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 create namespace $NAMESPACE
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2 create namespace $NAMESPACE
-
-SERVER_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT_1
-CLIENT_CTX=$WORKLOAD_K8S_CLUSTER_CONTEXT_2
-
-export IMAGE_TAG=v0.1.10 # Version of cofide-demos to use
-COFIDE_DEMOS_BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"
-
-SERVER_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-server/deploy.yaml"
-export PING_PONG_SERVER_SERVICE_PORT=8443
-if ! curl --fail $SERVER_MANIFEST | envsubst | kubectl apply -n "$NAMESPACE" --context "$SERVER_CTX" -f -; then
-  echo "Error: Server deployment failed" >&2
-  exit 1
-fi
-echo "Server deployment complete"
-
-echo "Discovering server IP..."
-kubectl --context "$SERVER_CTX" wait --for=jsonpath="{.status.loadBalancer.ingress[0].ip}" service/ping-pong-server -n $NAMESPACE --timeout=60s
-export PING_PONG_SERVER_SERVICE_HOST=$(kubectl --context "$SERVER_CTX" get service ping-pong-server -n $NAMESPACE -o "jsonpath={.status.loadBalancer.ingress[0].ip}")
-echo "Server is $PING_PONG_SERVER_SERVICE_HOST"
-
-CLIENT_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-client/deploy.yaml"
-if ! curl --fail $CLIENT_MANIFEST | envsubst | kubectl apply --context "$CLIENT_CTX" -n "$NAMESPACE" -f -; then
-  echo "Error: client deployment failed" >&2
-  exit 1
-fi
-echo "Client deployment complete"
-
-kubectl --context $CLIENT_CTX wait -n $NAMESPACE --for=condition=Available --timeout 120s deployments/ping-pong-client
-kubectl --context $CLIENT_CTX logs -n $NAMESPACE deployments/ping-pong-client -f
+./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
