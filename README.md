@@ -127,14 +127,14 @@ Validates the deployment with ping-pong.
 ./single-trust-zone-cofidectl-eks.sh
 ```
 
-## Federated trust zones with cofidectl on EKS
+## Federated trust zones with Helm on EKS
 
 This script requires two AWS EKS clusters.
 Use your own EKS clusters or use the Terraform configration in `terraform/eks-clusters` to provision them.
 
-Run this script to deploy two federated trust zones in existing AWS EKS clusters using cofidectl with the Cofide Terraform provider and Cofide Trust Zone Server.
+Run this script to deploy two federated trust zones in existing AWS EKS clusters using cofidectl to generate Helm values with the Cofide Terraform provider and Cofide Trust Zone Server.
 Validates the deployment with ping-pong.
 
 ```sh
-./federated-cofidectl-tf-eks.sh
+./federated-helm-tf-eks.sh
 ```

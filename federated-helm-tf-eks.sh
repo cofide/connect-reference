@@ -18,8 +18,8 @@ source eks.env
 export REGISTRY=010438484483.dkr.ecr.eu-west-1.amazonaws.com
 export REPOSITORY=cofide/trust-zone-server
 export TAG=v1.10.11
-export CONNECT_URL=$CONNECT_URL
-export CONNECT_TRUST_DOMAIN=$CONNECT_TRUST_DOMAIN
+export CONNECT_URL
+export CONNECT_TRUST_DOMAIN
 
 BUNDLE_ID=$(echo $CONNECT_TRUST_DOMAIN | cut -d '.' -f 1)
 export CONNECT_BUNDLE_ENDPOINT_URL="https://$CONNECT_BUNDLE_HOST/$BUNDLE_ID/bundle"
@@ -45,16 +45,7 @@ kubectl apply -f generated/ebs-storageclass.yaml --context $WORKLOAD_K8S_CLUSTER
 kubectl apply -f templates/trust-zone-server-rbac.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
 kubectl apply -f templates/trust-zone-server-rbac.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 
-## Deploy workload identity infrastructure using cofidectl and terraform-provider-cofide
-
-rm -f cofide.yaml
-cofidectl connect init \
-  --connect-url $CONNECT_URL \
-  --connect-trust-domain $CONNECT_TRUST_DOMAIN \
-  --connect-bundle-host $CONNECT_BUNDLE_HOST \
-  --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
-  --connect-datasource
+## Register trust zones, clusters, attestation policies and federations in Connect using Terraform
 
 set +x
 ACCESS_TOKEN=$(grep 'cofide_access_token' ~/.cofide/credentials | cut -d'=' -f2)
@@ -91,7 +82,75 @@ terraform -chdir=./terraform/federated init -input=false -backend=false
 terraform -chdir=./terraform/federated destroy -input=false -auto-approve
 terraform -chdir=./terraform/federated apply -input=false -auto-approve
 
-cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1 --trust-zone $WORKLOAD_TRUST_ZONE_2
+# Deploy workload identity infrastructure using cofidectl to generate Helm values.
+
+rm -f cofide.yaml
+cofidectl connect init \
+  --connect-url $CONNECT_URL \
+  --connect-trust-domain $CONNECT_TRUST_DOMAIN \
+  --connect-bundle-host $CONNECT_BUNDLE_HOST \
+  --authorization-domain $AUTHORIZATION_DOMAIN \
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
+  --connect-datasource
+
+## Deploy SPIRE components using Helm
+
+crds_chart_version="0.4.0"
+chart_version="0.21.0"
+chart_repo="https://spiffe.github.io/helm-charts-hardened/"
+values_file_1=generated/spire-values-${WORKLOAD_TRUST_ZONE_1}.yaml
+values_file_2=generated/spire-values-${WORKLOAD_TRUST_ZONE_2}.yaml
+
+./cofidectl trust-zone helm values \
+  $WORKLOAD_TRUST_ZONE_1 --output-file $values_file_1
+
+./cofidectl trust-zone helm values \
+  $WORKLOAD_TRUST_ZONE_2 --output-file $values_file_2
+
+helm upgrade --install spire-crds spire-crds --repo $chart_repo --version $crds_chart_version \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 --namespace spire-mgmt --create-namespace \
+  --wait
+
+helm upgrade --install spire-crds spire-crds --repo $chart_repo --version $crds_chart_version \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_2 --namespace spire-mgmt --create-namespace \
+  --wait
+
+helm upgrade --install spire spire --repo $chart_repo --version $chart_version \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 --namespace spire-mgmt --create-namespace \
+  --values $values_file_1 --wait
+
+helm upgrade --install spire spire --repo $chart_repo --version $chart_version \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_2 --namespace spire-mgmt --create-namespace \
+  --values $values_file_2 --wait
+
+## Deploy Cofide agent using Helm
+
+chart_version=0.1.3
+chart_uri=oci://010438484483.dkr.ecr.eu-west-1.amazonaws.com/cofide/helm-charts/cofide-agent
+values_file_1=generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_1}.yaml
+values_file_2=generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_2}.yaml
+
+./cofidectl connect agent helm values \
+  --trust-zone $WORKLOAD_TRUST_ZONE_1 --cluster $WORKLOAD_K8S_CLUSTER_NAME_1 \
+  --output-file $values_file_1 --generate-token=false
+
+./cofidectl connect agent helm values \
+  --trust-zone $WORKLOAD_TRUST_ZONE_2 --cluster $WORKLOAD_K8S_CLUSTER_NAME_2 \
+  --output-file $values_file_2 --generate-token=false
+
+token_1=$(./cofidectl connect agent join-token generate \
+  --trust-zone $WORKLOAD_TRUST_ZONE_1 --cluster $WORKLOAD_K8S_CLUSTER_NAME_1 --output-file -)
+
+token_2=$(./cofidectl connect agent join-token generate \
+  --trust-zone $WORKLOAD_TRUST_ZONE_2 --cluster $WORKLOAD_K8S_CLUSTER_NAME_2 --output-file -)
+
+helm upgrade --install cofide-agent $chart_uri --version $chart_version \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 --namespace cofide --create-namespace \
+  --values $values_file_1 --set agent.env.AGENT_TOKEN=$token_1 --wait
+
+helm upgrade --install cofide-agent $chart_uri --version $chart_version \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_2 --namespace cofide --create-namespace \
+  --values $values_file_2 --set agent.env.AGENT_TOKEN=$token_2 --wait
 
 ## Validate the deployment using ping-pong demo
 
