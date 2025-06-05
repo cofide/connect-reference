@@ -42,6 +42,12 @@ else
   kubectl --context "$SERVER_CTX" wait --for=jsonpath="{.status.loadBalancer.ingress[0].${SVC_FIELD}}" service/ping-pong-server -n $NAMESPACE --timeout=60s
   export PING_PONG_SERVER_SERVICE_HOST=$(kubectl --context "$SERVER_CTX" get service ping-pong-server -n $NAMESPACE -o "jsonpath={.status.loadBalancer.ingress[0].${SVC_FIELD}}")
   echo "Server is $PING_PONG_SERVER_SERVICE_HOST"
+  if [[ $SERVER_CTX =~ arn:* ]]; then
+    echo "Waiting for ping-pong service hostname to resolve..."
+    while ! nslookup $PING_PONG_SERVER_SERVICE_HOST &>/dev/null; do
+      sleep 2
+    done
+  fi
 fi
 
 CLIENT_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-client/deploy.yaml"
