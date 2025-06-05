@@ -74,7 +74,7 @@ export TF_VAR_cluster_2_name="${WORKLOAD_K8S_CLUSTER_NAME_2}"
 export TF_VAR_cluster_2_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_2}"
 export TF_VAR_cluster_2_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml)"
 
-export TF_VAR_attestation_policy_name="${NAMESPACE-ns-$UNIQUE_ID}"
+export TF_VAR_attestation_policy_name="${NAMESPACE}-ns-${UNIQUE_ID}"
 export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
 terraform -chdir=./terraform/federated init -input=false -backend=false
@@ -91,8 +91,7 @@ cofidectl connect init \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
   --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
-  --connect-datasource
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID
 
 ## Deploy SPIRE components using Helm
 
