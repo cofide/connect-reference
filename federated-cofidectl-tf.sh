@@ -73,8 +73,7 @@ cofidectl connect init \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
   --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
-  --connect-datasource
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID
 
 set +x
 ACCESS_TOKEN=$(grep 'cofide_access_token' ~/.cofide/credentials | cut -d'=' -f2)
