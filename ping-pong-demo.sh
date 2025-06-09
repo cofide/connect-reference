@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
 # This script runs a ping-pong demo workload from https://github.com/cofide/cofide-demos/.
 # The ping-pong client and server communicate over SPIFFE mTLS.
@@ -49,6 +49,7 @@ else
     done
   fi
 fi
+kubectl --context $SERVER_CTX get pods -n $NAMESPACE
 
 CLIENT_MANIFEST="$COFIDE_DEMOS_BRANCH/workloads/ping-pong/ping-pong-client/deploy.yaml"
 if ! curl --fail $CLIENT_MANIFEST | envsubst | kubectl apply --context "$CLIENT_CTX" -n "$NAMESPACE" -f -; then
@@ -58,4 +59,5 @@ fi
 echo "Client deployment complete"
 
 kubectl --context $CLIENT_CTX wait -n $NAMESPACE --for=condition=Available --timeout 120s deployments/ping-pong-client
+kubectl --context $CLIENT_CTX get pods -n $NAMESPACE
 kubectl --context $CLIENT_CTX logs -n $NAMESPACE deployments/ping-pong-client -f
