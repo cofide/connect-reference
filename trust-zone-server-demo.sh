@@ -215,3 +215,5 @@ announce "Cofide Trust Zone Server is using Connect as a datastore.\nSome state 
 announce "Validate the deployment using ping-pong demo"
 
 run ./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+
+run ./multi-mesh-eks.sh $WORKLOAD_TRUST_DOMAIN_1 $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1
