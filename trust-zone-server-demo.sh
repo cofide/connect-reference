@@ -204,11 +204,17 @@ run kubectl get pods -n cofide --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 pause
 
 announce "Cofide Trust Zone Server is using Connect as a datastore.\nSome state was populated using Terraform earlier.\nOther state such as the attested SPIRE agents is more dynamic, and managed by the Trust Zone Server"
+
+TRUST_ZONE_ID=$(cofidectl connect api call \
+    --service proto.connect.trust_zone_service.v1alpha1.TrustZoneService \
+    --rpc ListTrustZones \
+    --data '{"filter": {"name": "demo-workload-a"}}' | jq -r ".trustZones[0].id")
+
 # FIXME: Sometimes we see authentication failures - retry.
-#until run cofidectl connect api call --service proto.connect.datastore_service.v1alpha1.DataStoreService --rpc ListAttestedNodes; do
-  #sleep 1
-#done
-#pause
+until cofidectl connect api call --service proto.connect.datastore_service.v1alpha1.DataStoreService --rpc ListAttestedNodes --data "{\"trust_zone_id\": \"$TRUST_ZONE_ID\"}"; do
+  sleep 1
+done
+pause
 
 ## Validate the deployment using ping-pong demo
 
