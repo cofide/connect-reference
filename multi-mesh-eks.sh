@@ -62,6 +62,9 @@ cofidectl attestation-policy-binding add \
   --attestation-policy $NAMESPACE-ns-$UNIQUE_ID \
   --federates-with $WORKLOAD_TRUST_ZONE
 
+
+announce "Deploying SPIRE components using Helm"
+
 crds_chart_version="0.4.0"
 chart_version="0.21.0"
 chart_repo="https://spiffe.github.io/helm-charts-hardened/"
@@ -80,6 +83,8 @@ helm upgrade --install spire spire --repo $chart_repo --version $chart_version \
 
 pause
 
+announce "Deploying Cofide Agent using Helm"
+
 chart_version=0.1.3
 chart_uri=oci://010438484483.dkr.ecr.eu-west-1.amazonaws.com/cofide/helm-charts/cofide-agent
 values_file=generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE}.yaml
@@ -94,6 +99,10 @@ token=$(cofidectl connect agent join-token generate \
 helm upgrade --install cofide-agent $chart_uri --version $chart_version \
   --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT --namespace cofide --create-namespace \
   --values $values_file --set agent.env.AGENT_TOKEN=$token --wait
+
+pause
+
+announce "Deploying spiffe-enable"
 
 kubectl apply -f ./templates/production-namespace.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT
 
@@ -116,6 +125,8 @@ helm upgrade --install --namespace cofide \
   --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT \
   --set image.tag="0.2.1"
 
+pause
+
 announce "Deploying ping-pong workloads"
 
 export IMAGE_TAG=v0.1.10
@@ -132,8 +143,20 @@ BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_T
 MANIFEST="$BRANCH/workloads/ping-pong-cofide/ping-pong-cofide-client/deploy.yaml"
 curl --fail $MANIFEST | envsubst | kubectl apply -n production -f - --context $OTHER_CONTEXT
 
+pause
 announce "Deploying FederatedService"
 
 export OTHER_TRUST_DOMAIN
-cat ./templates/federated-service.yaml | envsubst | yq 
+cat ./templates/federated-service.yaml | envsubst | yq
+pause
+
 cat ./templates/federated-service.yaml | envsubst | kubectl apply -n production -f - --context $WORKLOAD_K8S_CLUSTER_CONTEXT
+
+SERVER_POD=$(kubectl get pods --selector=app=ping-pong-server -o jsonpath="{.items[0].metadata.name}" -n production)
+
+announce "Port forward to spiffe-enable debug dashboard with:\nkubectl port-forward -n production $SERVER_POD 8080:8080"
+pause
+
+announce "View ping-pong client logs on $OTHER_TRUST_DOMAIN"
+
+kubectl --context $OTHER_CONTEXT logs -n $NAMESPACE deployments/ping-pong-client -f

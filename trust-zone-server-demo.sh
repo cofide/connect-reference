@@ -216,4 +216,7 @@ announce "Validate the deployment using ping-pong demo"
 
 run ./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 
-run ./multi-mesh-eks.sh $WORKLOAD_TRUST_DOMAIN_1 $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+read -p "Continue to Istio demo? (y/N) " input
+if [[ $input == "y" ]]; then
+	run ./multi-mesh-eks.sh $WORKLOAD_TRUST_DOMAIN_1 $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+fi
