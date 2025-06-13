@@ -95,13 +95,33 @@ helm upgrade --install cofide-agent $chart_uri --version $chart_version \
   --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT --namespace cofide --create-namespace \
   --values $values_file --set agent.env.AGENT_TOKEN=$token --wait
 
+kubectl apply -f ./templates/production-namespace.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT
+
+helm repo add jetstack https://charts.jetstack.io --force-update --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT
+helm repo update --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT
+
+helm upgrade --install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.17.1 \
+  --set crds.enabled=true \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT
+
+kubectl apply -f ./templates/cert-manager-issuer.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT
+
+helm upgrade --install --namespace cofide \
+  spiffe-enable \
+  cofide/spiffe-enable \
+  --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT \
+  --set image.tag="0.2.1"
+
 announce "Deploying ping-pong workloads"
 
-kubectl create namespace production --context $WORKLOAD_K8S_CLUSTER_CONTEXT
 export IMAGE_TAG=v0.1.10
 BRANCH="https://raw.githubusercontent.com/cofide/cofide-demos/refs/tags/$IMAGE_TAG"
 MANIFEST="$BRANCH/workloads/ping-pong-cofide/ping-pong-cofide-server/deploy.yaml"
-curl --fail $MANIFEST | envsubst | kubectl apply -n production -f - --context $WORKLOAD_K8S_CLUSTER_CONTEXT
+cat ./templates/ping-pong-cofide-server.yaml | envsubst | kubectl apply -n production -f - --context $WORKLOAD_K8S_CLUSTER_CONTEXT
 
 export IMAGE_TAG=v0.1.10
 export PING_PONG_SERVER_SERVICE_PORT=8443
@@ -115,4 +135,5 @@ curl --fail $MANIFEST | envsubst | kubectl apply -n production -f - --context $O
 announce "Deploying FederatedService"
 
 export OTHER_TRUST_DOMAIN
+cat ./templates/federated-service.yaml | envsubst | yq 
 cat ./templates/federated-service.yaml | envsubst | kubectl apply -n production -f - --context $WORKLOAD_K8S_CLUSTER_CONTEXT
