@@ -1,0 +1,12 @@
+apiVersion: registry.cofide.io/v1alpha1
+kind: FederatedService
+metadata:
+  name: demo
+  namespace: production
+spec:
+  name: server
+  namespace: production
+  exportedTrustDomains: ["${OTHER_TRUST_DOMAIN}"]
+  workloadLabels:
+    app: ping-pong-server
+  port: 8443
