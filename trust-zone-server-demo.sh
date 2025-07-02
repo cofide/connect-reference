@@ -8,25 +8,7 @@ set -uo pipefail
 # It then runs a ping-pong test between the trust zones.
 
 PAUSE=${PAUSE:-1}
-
-function announce {
-    >&2 echo -e "\e[33m$*\e[39m"
-    if [[ ${PAUSE} = 1 ]]; then
-        read
-    fi
-}
-
-function run {
-    >&2 echo -e "\e[34mRunning: \e[94m$*\e[39m"
-    $*
-}
-
-function pause {
-    >&2 echo -e "\e[34mDone\e[39m"
-    if [[ ${PAUSE} = 1 ]]; then
-        read
-    fi
-}
+source util.sh
 
 # Prerequisites: ./prerequisites.sh
 
@@ -47,6 +29,9 @@ export CONNECT_BUNDLE_ENDPOINT_URL="https://$CONNECT_BUNDLE_HOST/$BUNDLE_ID/bund
 
 # Generate unique ID for cluster, trust zone & trust domain disambiguation
 UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
+
+WORKLOAD_TRUST_DOMAIN_1=$WORKLOAD_TRUST_DOMAIN_1-$UNIQUE_ID
+WORKLOAD_TRUST_DOMAIN_2=$WORKLOAD_TRUST_DOMAIN_2-$UNIQUE_ID
 
 export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_1
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_1
@@ -178,9 +163,9 @@ values_file_2=generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_2}.yaml
 
 announce "Deploying Cofide Agent using Helm"
 
-run cofidectl connect agent helm values \
-  --trust-zone $WORKLOAD_TRUST_ZONE_1 --cluster $WORKLOAD_K8S_CLUSTER_NAME_1 \
-  --output-file $values_file_1 --generate-token=false
+while [[ $(run cofidectl connect agent helm values --trust-zone $WORKLOAD_TRUST_ZONE_1 --cluster $WORKLOAD_K8S_CLUSTER_NAME_1 --output-file $values_file_1 --generate-token=false) == "Error: rpc error: code = Unauthenticated desc = Jwks remote fetch is failed" ]]; do
+  sleep 1
+done
 
 run cofidectl connect agent helm values \
   --trust-zone $WORKLOAD_TRUST_ZONE_2 --cluster $WORKLOAD_K8S_CLUSTER_NAME_2 \
@@ -219,8 +204,14 @@ run kubectl get pods -n cofide --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 pause
 
 announce "Cofide Trust Zone Server is using Connect as a datastore.\nSome state was populated using Terraform earlier.\nOther state such as the attested SPIRE agents is more dynamic, and managed by the Trust Zone Server"
+
+TRUST_ZONE_ID=$(cofidectl connect api call \
+    --service proto.connect.trust_zone_service.v1alpha1.TrustZoneService \
+    --rpc ListTrustZones \
+    --data "{\"filter\": {\"name\": \"$WORKLOAD_K8S_CLUSTER_NAME_1\"}}" | jq -r ".trustZones[0].id")
+
 # FIXME: Sometimes we see authentication failures - retry.
-until run cofidectl connect api call --service proto.connect.datastore_service.v1alpha1.DataStoreService --rpc ListAttestedNodes; do
+until cofidectl connect api call --service proto.connect.datastore_service.v1alpha1.DataStoreService --rpc ListAttestedNodes --data "{\"trust_zone_id\": \"$TRUST_ZONE_ID\"}"; do
   sleep 1
 done
 pause
@@ -230,3 +221,8 @@ pause
 announce "Validate the deployment using ping-pong demo"
 
 run ./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+
+read -p "Continue to Istio demo? (y/N) " input
+if [[ $input == "y" ]]; then
+	run ./multi-mesh-eks.sh $WORKLOAD_TRUST_DOMAIN_1 $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+fi
