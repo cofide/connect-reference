@@ -208,7 +208,7 @@ announce "Cofide Trust Zone Server is using Connect as a datastore.\nSome state 
 TRUST_ZONE_ID=$(cofidectl connect api call \
     --service proto.connect.trust_zone_service.v1alpha1.TrustZoneService \
     --rpc ListTrustZones \
-    --data '{"filter": {"name": "demo-workload-a"}}' | jq -r ".trustZones[0].id")
+    --data "{\"filter\": {\"name\": \"$WORKLOAD_K8S_CLUSTER_NAME_1\"}}" | jq -r ".trustZones[0].id")
 
 # FIXME: Sometimes we see authentication failures - retry.
 until cofidectl connect api call --service proto.connect.datastore_service.v1alpha1.DataStoreService --rpc ListAttestedNodes --data "{\"trust_zone_id\": \"$TRUST_ZONE_ID\"}"; do
