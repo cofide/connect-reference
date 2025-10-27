@@ -50,7 +50,8 @@ cofidectl connect init \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
   --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
+  --use-oss-spire
 
 cofidectl trust-zone add \
   $WORKLOAD_TRUST_ZONE_1 \

@@ -4,7 +4,7 @@ spire-server:
     repository: ${REPOSITORY}
     tag: ${TAG}
   controllerManager:
-    enabled: false
+    enabled: ${LOCAL}
   extraEnv:
     - name: DATASTORE
       value: connect

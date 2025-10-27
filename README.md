@@ -27,6 +27,7 @@ You will also need the following software installed on the machine running the d
 - [Helm](https://helm.sh/docs/intro/install/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [uuidgen](https://man7.org/linux/man-pages/man1/uuidgen.1.html)
+- [yq](https://mikefarah.gitbook.io/yq/)
 
 If running the local Kind-based deployments you will also need:
 

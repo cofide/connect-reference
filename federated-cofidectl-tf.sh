@@ -35,6 +35,8 @@ WORKLOAD_TRUST_DOMAIN_1="${UNIQUE_ID}-1.test"
 export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_1
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_1
 
+export LOCAL
+
 envsubst < templates/trust-zone-server-values.yaml > generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml
 
 WORKLOAD_K8S_CLUSTER_NAME_2="workload-${UNIQUE_ID}-2"
@@ -73,7 +75,14 @@ cofidectl connect init \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
   --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
+  --use-oss-spire
+
+# If using OSS Spire, remove the image section from Helm values to use default (OSS Spire) instead
+if [ "$(yq '.plugin_config."cofidectl-connect".cofide_spire' cofide.yaml)" = "false" ]; then
+  yq -y -i 'del(."spire-server".image)' generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml \
+    generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml
+fi
 
 set +x
 ACCESS_TOKEN=$(grep 'cofide_access_token' ~/.cofide/credentials | cut -d'=' -f2)
