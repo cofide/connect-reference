@@ -75,6 +75,13 @@ Run this script before any others to perform checks and logins:
 ./prerequisites.sh
 ```
 
+## Login
+
+If prerequisites have already been installed, run this script to just do the logins:
+```sh
+./login.sh
+```
+
 ## Single trust zone with cofidectl
 
 Run this script to deploy a single trust zone in a Kind cluster using cofidectl.
