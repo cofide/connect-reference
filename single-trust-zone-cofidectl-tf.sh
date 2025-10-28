@@ -41,7 +41,7 @@ cofidectl connect init \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
   --authorization-domain $AUTHORIZATION_DOMAIN \
   --authorization-client-id $AUTHORIZATION_CLIENT_ID \
-  --use-oss-spire
+  --use-join-token
 
 set +x
 ACCESS_TOKEN=$(grep 'cofide_access_token' ~/.cofide/credentials | cut -d'=' -f2)
@@ -71,6 +71,14 @@ terraform -chdir=./terraform/single-trust-zone destroy -input=false -auto-approv
 terraform -chdir=./terraform/single-trust-zone apply -input=false -auto-approve
 
 cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE
+
+## Install cofide observer so workloads are pushed to connect for identities to be issued
+helm repo add cofide https://cofide.github.io/helm-charts --force-update
+helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
+    --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT --namespace cofide --create-namespace \
+    --set observer.connectURL=$CONNECT_URL \
+    --set observer.connectTrustDomain=$CONNECT_TRUST_DOMAIN \
+    --wait
 
 ## Validate the deployment using ping-pong demo
 

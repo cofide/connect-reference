@@ -91,7 +91,7 @@ Validates the deployment with ping-pong.
 ./single-trust-zone-cofidectl.sh
 ```
 
-A corresponding script that uses cofidectl and [terraform-provider-cofide](https://registry.terraform.io/providers/cofide/cofide/latest/docs) can be run using:
+A corresponding script that uses cofidectl and [terraform-provider-cofide](https://registry.terraform.io/providers/cofide/cofide/latest/docs) with Cofide Spire can be run using:
 
 ```sh
 ./single-trust-zone-cofidectl-tf.sh
