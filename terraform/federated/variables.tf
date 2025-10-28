@@ -18,11 +18,6 @@ variable "cluster_1_kubernetes_context" {
   description = "The Kubernetes context for the cluster associated with trust zone 1."
 }
 
-variable "cluster_1_extra_helm_values" {
-  type        = string
-  description = "The extra helm values for the cluster associated with trust zone 1."
-}
-
 variable "attestation_policy_name" {
   type        = string
   description = "The name of the namespace attestation policy."
@@ -51,9 +46,4 @@ variable "cluster_2_name" {
 variable "cluster_2_kubernetes_context" {
   type        = string
   description = "The Kubernetes context for the cluster associated with trust zone 2."
-}
-
-variable "cluster_2_extra_helm_values" {
-  type        = string
-  description = "The extra helm values for the cluster associated with trust zone 2."
 }

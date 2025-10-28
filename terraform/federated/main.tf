@@ -9,7 +9,6 @@ resource "cofide_connect_cluster" "tz_1" {
   org_id             = cofide_connect_trust_zone.tz_1.org_id
   profile            = "kubernetes"
   kubernetes_context = var.cluster_1_kubernetes_context
-  extra_helm_values  = var.cluster_1_extra_helm_values != "" ? file(var.cluster_1_extra_helm_values) : null
 
   trust_provider = {
     kind = "kubernetes"
@@ -29,7 +28,6 @@ resource "cofide_connect_cluster" "tz_2" {
   org_id             = cofide_connect_trust_zone.tz_2.org_id
   profile            = "kubernetes"
   kubernetes_context = var.cluster_2_kubernetes_context
-  extra_helm_values  = var.cluster_2_extra_helm_values != "" ? file(var.cluster_2_extra_helm_values) : null
 
   trust_provider = {
     kind = "kubernetes"

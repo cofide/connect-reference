@@ -2,19 +2,18 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/cofide/cofide" {
-  version     = "0.4.0"
-  constraints = "0.4.0"
+  version     = "0.6.0"
+  constraints = "0.6.0"
   hashes = [
-    "h1:8XocHPlHRn5x7eEJg3Ps4IcrG8acwXqlz2JLFG7BH4E=",
-    "h1:a1AAE2NKud3yulrDRN95ah+p/x8JBhtPr+CCyoHFqDc=",
-    "zh:1962b9d81ca21be70b2c94fe4b02c55c0739c4d09c94103bca2f24e9f1e222c0",
+    "h1:w4CV+LRi195uohaob5AMpJSw6w0x6H79XFXNw7n8P88=",
+    "zh:37ce5791c7e7b4bdcf49d0f34407e52c852559cd1628259faf6fbdf28b719b1f",
     "zh:3d3189e7594fad1b5ecf110b5c4ec802de9f1328487eec106408cecf0ba70284",
-    "zh:45cba6a8e8fc1d478311d9d38503ab2547ed9748684faf1ca84466ee10f5405e",
-    "zh:52c074d018a34f92846b3e958d501db3415a0f502b7b59bbdf490e4f700318e2",
-    "zh:6c468e2058c628b2960fecf59088251da715f678c5249f24195b6deca3b12283",
-    "zh:6cdaea74ee0cbc01f52a91cabc85b736fbd11d2e237e525fb1e26b7a2a282ff3",
-    "zh:b306341a9272c3d9d44feb01ad202818c5e6c5b4e225716064f1c9d160ff48a2",
-    "zh:c82d4fb60eada576cff1fd19142a6704afdf0eeea84076c9b32b6eaa764543af",
-    "zh:eb039b8fbcba76bb3c76fe0343e4e8161d6cb8b125ad82809806e3aad4790270",
+    "zh:49016aea2f182e1aa0f9ab365f5ac5e33d16b4f20bb88d83093856930c1c0c48",
+    "zh:6287cf52e8460d1fe93dfdee102d787c9024241ee6707c7c0d9985e66c7e8123",
+    "zh:73f531f392502e9d718125dcf548ddb8ad9636d39d52af602900b1b6c6cb07e8",
+    "zh:8ae0bce63b20cc1caf9706458f61d2d631ba42eeb809ee382a2517b2f516767f",
+    "zh:b29e5a6f4993e9343e5ac9b2d30fb9d0a332125b1e628e4576ae3ec2aa3823a6",
+    "zh:d9f55139c0c190b21cd85d880536f8d6c35631037c96efc6269d9da620316bd4",
+    "zh:f22a8402c61d520b339501901e3b8a5825925daa088578f12e44c9f9c92b1e06",
   ]
 }
