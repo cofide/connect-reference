@@ -20,8 +20,9 @@ spec:
       templates:
         spire: |
           spec:
-            containers:
+            initContainers:
             - name: istio-proxy
+              restartPolicy: Always
               volumeMounts:
               - name: workload-socket
                 mountPath: /run/secrets/workload-spiffe-uds
