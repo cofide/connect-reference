@@ -4,8 +4,6 @@
 
 set -euxo pipefail
 
-source config.env
-
 for cmd in aws cofidectl curl docker helm kubectl uuidgen; do
   if ! type $cmd; then
     echo "Unable to find $cmd"
@@ -13,24 +11,13 @@ for cmd in aws cofidectl curl docker helm kubectl uuidgen; do
   fi
 done
 
-rm -f cofide.yaml
-cofidectl connect init \
-  --connect-url $CONNECT_URL \
-  --connect-trust-domain $CONNECT_TRUST_DOMAIN \
-  --connect-bundle-host $CONNECT_BUNDLE_HOST \
-  --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
-  --connect-datasource
-
-if ! cofidectl connect login --check; then
-  cofidectl connect login
+# Minimum kind version so default Kubernetes cluster version includes sidecar containers
+# https://kubernetes.io/blog/2025/04/23/kubernetes-v1-33-release/#stable-sidecar-containers
+min_version="0.30.0"
+current_version=$(kind version | awk '{print $2}' | sed 's/^v//')
+if ! printf '%s\n%s\n' "$min_version" "$current_version" | sort -V -C &>/dev/null; then
+  echo "Kind version v${min_version} or higher is required, but found v${current_version}."
+  exit 1
 fi
 
-if ! aws sts get-caller-identity; then
-  aws sso login
-fi
-
-if [[ ${LOCAL} == "true" ]]; then
-  aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 010438484483.dkr.ecr.eu-west-1.amazonaws.com
-  aws ecr get-login-password --region eu-west-1 | helm registry login --username AWS --password-stdin 010438484483.dkr.ecr.eu-west-1.amazonaws.com
-fi
+./login.sh

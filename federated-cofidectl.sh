@@ -4,8 +4,8 @@ set -euxo pipefail
 
 # This script creates a pair of kind clusters and defines trust zones,
 # clusters, an attestation policy, bindings and federations in the staging
-# Connect using cofidectl. It then runs a ping-pong test between the trust
-# zones.
+# Connect using cofidectl with Cofide SPIRE. It then runs a ping-pong test
+# between the trust zones.
 
 # Prerequisites: ./prerequisites.sh
 
@@ -50,7 +50,8 @@ cofidectl connect init \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
   --authorization-domain $AUTHORIZATION_DOMAIN \
-  --authorization-client-id $AUTHORIZATION_CLIENT_ID
+  --authorization-client-id $AUTHORIZATION_CLIENT_ID \
+  --use-join-token
 
 cofidectl trust-zone add \
   $WORKLOAD_TRUST_ZONE_1 \
@@ -89,6 +90,23 @@ cofidectl attestation-policy-binding add \
   --federates-with $WORKLOAD_TRUST_ZONE_1
 
 cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1 --trust-zone $WORKLOAD_TRUST_ZONE_2
+
+## Install cofide observer so workloads are pushed to connect for identities to be issued
+helm repo add cofide https://cofide.github.io/helm-charts --force-update
+helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
+    --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 --namespace cofide --create-namespace \
+    --set observer.connectURL=$CONNECT_URL \
+    --set observer.connectTrustDomain=$CONNECT_TRUST_DOMAIN \
+    --wait
+helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
+    --kube-context $WORKLOAD_K8S_CLUSTER_CONTEXT_2 --namespace cofide --create-namespace \
+    --set observer.connectURL=$CONNECT_URL \
+    --set observer.connectTrustDomain=$CONNECT_TRUST_DOMAIN \
+    --wait
+
+## Wait for federation to be established
+./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
+./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
 
 ## Validate the deployment using ping-pong demo
 

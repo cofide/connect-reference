@@ -75,16 +75,23 @@ Run this script before any others to perform checks and logins:
 ./prerequisites.sh
 ```
 
+## Login
+
+If prerequisites have already been installed, run this script to just do the logins:
+```sh
+./login.sh
+```
+
 ## Single trust zone with cofidectl
 
-Run this script to deploy a single trust zone in a Kind cluster using cofidectl.
+Run this script to deploy a single trust zone in a Kind cluster using cofidectl with OSS SPIRE.
 Validates the deployment with ping-pong.
 
 ```sh
 ./single-trust-zone-cofidectl.sh
 ```
 
-A corresponding script that uses cofidectl and [terraform-provider-cofide](https://registry.terraform.io/providers/cofide/cofide/latest/docs) can be run using:
+A corresponding script that uses cofidectl and [terraform-provider-cofide](https://registry.terraform.io/providers/cofide/cofide/latest/docs) with Cofide SPIRE can be run using:
 
 ```sh
 ./single-trust-zone-cofidectl-tf.sh
@@ -92,7 +99,7 @@ A corresponding script that uses cofidectl and [terraform-provider-cofide](https
 
 ## Federated trust zones with cofidectl
 
-Run this script to deploy two federated trust zones in Kind clusters using cofidectl.
+Run this script to deploy two federated trust zones in Kind clusters using cofidectl with Cofide SPIRE.
 Validates the deployment with federated ping-pong.
 
 ```sh
@@ -107,7 +114,7 @@ A corresponding script that uses cofidectl and [terraform-provider-cofide](https
 
 ## Multi-mesh with cofidectl
 
-Run this script to deploy two federated trust zones in Kind clusters with Istio using cofidectl.
+Run this script to deploy two federated trust zones in Kind clusters with Istio using cofidectl with Cofide SPIRE.
 An Istio gateway and a Cofide Federated Service are created in one of the clusters.
 Validates the deployment with multi-mesh ping-pong.
 
