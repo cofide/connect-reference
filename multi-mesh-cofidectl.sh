@@ -4,8 +4,8 @@ set -euxo pipefail
 
 # This script creates a pair of kind clusters with Istio installed, and defines
 # trust zones, clusters, an attestation policy, bindings and federations in the
-# staging Connect using cofidectl. It then creates a federated service and runs
-# a ping-pong test between the trust zones.
+# staging Connect using cofidectl with Cofide SPIRE. It then creates a federated
+# service and runs a ping-pong test between the trust zones.
 
 # Prerequisites: ./prerequisites.sh
 
