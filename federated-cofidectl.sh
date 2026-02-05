@@ -55,15 +55,19 @@ cofidectl connect init \
 
 cofidectl trust-zone add \
   $WORKLOAD_TRUST_ZONE_1 \
-  --trust-domain $WORKLOAD_TRUST_DOMAIN_1 \
-  --kubernetes-cluster $WORKLOAD_K8S_CLUSTER_NAME_1 \
+  --trust-domain $WORKLOAD_TRUST_DOMAIN_1
+cofidectl cluster add \
+  $WORKLOAD_K8S_CLUSTER_NAME_1 \
+  --trust-zone $WORKLOAD_TRUST_ZONE_1 \
   --kubernetes-context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 \
   --profile kubernetes
 
 cofidectl trust-zone add \
   $WORKLOAD_TRUST_ZONE_2 \
   --trust-domain $WORKLOAD_TRUST_DOMAIN_2 \
-  --kubernetes-cluster $WORKLOAD_K8S_CLUSTER_NAME_2 \
+cofidectl cluster add \
+  $WORKLOAD_K8S_CLUSTER_NAME_2 \
+  --trust-zone $WORKLOAD_TRUST_ZONE_2 \
   --kubernetes-context $WORKLOAD_K8S_CLUSTER_CONTEXT_2 \
   --profile kubernetes
 
