@@ -2,7 +2,8 @@ cofidectl
 cofidectl.sh
 cofide.yaml
 *.sha256
-generated/*
+**/generated/*
+!**/generated/.gitkeep
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfvars

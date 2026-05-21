@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script runs a ping-pong demo workload from https://github.com/cofide/cofide-demos/.
 # The ping-pong client and server communicate over SPIFFE mTLS.
 # They may be in the same or different clusters and/or trust zones.
@@ -10,7 +12,7 @@ set -euxo pipefail
 # ping...
 # ...pong
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 SERVER_CTX=${1?Server context}
 CLIENT_CTX=${2?Client context}

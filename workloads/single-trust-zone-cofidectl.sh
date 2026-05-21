@@ -2,13 +2,15 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script creates a kind cluster and defines a trust zone, cluster,
 # attestation policy and binding in the staging Connect using cofidectl
 # with OSS SPIRE. It then runs a ping-pong test.
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 ## Deploy workload cluster
 
@@ -29,8 +31,8 @@ kind delete cluster --name $WORKLOAD_K8S_CLUSTER_NAME
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < templates/kind_workload_config_template.yaml > generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME --config generated/kind_workload_config.yaml
+envsubst < "$SCRIPT_DIR/templates/kind_workload_config_template.yaml" > "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -64,4 +66,4 @@ cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE
 
 ## Validate the deployment using ping-pong demo
 
-./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT $WORKLOAD_K8S_CLUSTER_CONTEXT
+"$SCRIPT_DIR/ping-pong-demo.sh" $WORKLOAD_K8S_CLUSTER_CONTEXT $WORKLOAD_K8S_CLUSTER_CONTEXT

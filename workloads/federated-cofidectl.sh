@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script creates a pair of kind clusters and defines trust zones,
 # clusters, an attestation policy, bindings and federations in the staging
 # Connect using cofidectl with Cofide SPIRE. It then runs a ping-pong test
@@ -9,7 +11,7 @@ set -euxo pipefail
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 ## Deploy workload cluster
 
@@ -38,9 +40,9 @@ kind delete cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < templates/kind_workload_config_template.yaml > generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_1 --config generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2 --config generated/kind_workload_config.yaml
+envsubst < "$SCRIPT_DIR/templates/kind_workload_config_template.yaml" > "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_1 --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2 --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -109,9 +111,9 @@ helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
     --wait
 
 ## Wait for federation to be established
-./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
-./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
+"$SCRIPT_DIR/wait_for_federation.sh" $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
+"$SCRIPT_DIR/wait_for_federation.sh" $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
 
 ## Validate the deployment using ping-pong demo
 
-./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+"$SCRIPT_DIR/ping-pong-demo.sh" $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2

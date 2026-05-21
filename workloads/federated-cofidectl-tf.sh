@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script creates a pair of kind clusters and defines trust zones,
 # clusters, an attestation policy, bindings and federations in the staging
 # Connect using cofidectl and terraform-provider-cofide with Cofide SPIRE.
@@ -9,7 +11,7 @@ set -euxo pipefail
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 ## Deploy workload cluster
 
@@ -47,9 +49,9 @@ kind delete cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < templates/kind_workload_config_template.yaml > generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_1 --config generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2 --config generated/kind_workload_config.yaml
+envsubst < "$SCRIPT_DIR/templates/kind_workload_config_template.yaml" > "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_1 --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2 --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
 
 ## Deploy workload identity infrastructure using cofidectl and terraform-provider-cofide
 
@@ -89,11 +91,11 @@ export TF_VAR_trust_domain_2="${WORKLOAD_TRUST_DOMAIN_2}"
 export TF_VAR_cluster_2_name="${WORKLOAD_K8S_CLUSTER_NAME_2}"
 export TF_VAR_cluster_2_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_2}"
 
-terraform -chdir=./terraform/federated init -input=false -backend=false
+terraform -chdir="$SCRIPT_DIR/terraform/federated" init -input=false -backend=false
 
 ## Ensures that any resources from previous runs have been deleted first.
-terraform -chdir=./terraform/federated destroy -input=false -auto-approve
-terraform -chdir=./terraform/federated apply -input=false -auto-approve
+terraform -chdir="$SCRIPT_DIR/terraform/federated" destroy -input=false -auto-approve
+terraform -chdir="$SCRIPT_DIR/terraform/federated" apply -input=false -auto-approve
 
 cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1 --trust-zone $WORKLOAD_TRUST_ZONE_2
 
@@ -111,9 +113,9 @@ helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
     --wait
 
 ## Wait for federation to be established
-./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
-./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
+"$SCRIPT_DIR/wait_for_federation.sh" $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
+"$SCRIPT_DIR/wait_for_federation.sh" $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
 
 ## Validate the deployment using ping-pong demo
 
-./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+"$SCRIPT_DIR/ping-pong-demo.sh" $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2

@@ -4,6 +4,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 for cmd in aws cofidectl curl docker helm kubectl uuidgen; do
   if ! type $cmd; then
     echo "Unable to find $cmd"
@@ -20,4 +22,4 @@ if ! printf '%s\n%s\n' "$min_version" "$current_version" | sort -V -C &>/dev/nul
   exit 1
 fi
 
-./login.sh
+"$SCRIPT_DIR/login.sh"
