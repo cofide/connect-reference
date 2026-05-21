@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script uses two existing EKS clusters and defines trust zones,
 # clusters, an attestation policy, bindings and federations in the staging
 # Connect using cofidectl and terraform-provider-cofide.
@@ -9,11 +11,11 @@ set -euxo pipefail
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 ## Deploy workload cluster
 
-source eks.env
+source "$SCRIPT_DIR/eks.env"
 
 export REGISTRY=010438484483.dkr.ecr.eu-west-1.amazonaws.com
 export REPOSITORY=cofide/trust-zone-server
@@ -29,22 +31,22 @@ UNIQUE_ID=$(uuidgen | head -c 8 | tr A-Z a-z)
 
 export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_1
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_1
-envsubst < templates/trust-zone-server-values.yaml > generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml
+envsubst < "$SCRIPT_DIR/templates/trust-zone-server-values.yaml" > "$SCRIPT_DIR/generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml"
 
 export CLUSTER_NAME=$WORKLOAD_K8S_CLUSTER_NAME_2
 export TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_2
-envsubst < templates/trust-zone-server-values.yaml > generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml
+envsubst < "$SCRIPT_DIR/templates/trust-zone-server-values.yaml" > "$SCRIPT_DIR/generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml"
 
 export AWS_REGION
-envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
+envsubst <"$SCRIPT_DIR/templates/ebs-storageclass-template.yaml" >"$SCRIPT_DIR/generated/ebs-storageclass.yaml"
 
 # Create an EBS storageclass in each EKS cluster for the associated trust zone server.
-kubectl apply -f generated/ebs-storageclass.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
-kubectl apply -f generated/ebs-storageclass.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+kubectl apply -f "$SCRIPT_DIR/generated/ebs-storageclass.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+kubectl apply -f "$SCRIPT_DIR/generated/ebs-storageclass.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 
 # Applies the RBAC needed by the trust zone server in each EKS cluster.
-kubectl apply -f templates/trust-zone-server-rbac.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
-kubectl apply -f templates/trust-zone-server-rbac.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+kubectl apply -f "$SCRIPT_DIR/templates/trust-zone-server-rbac.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+kubectl apply -f "$SCRIPT_DIR/templates/trust-zone-server-rbac.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 
 ## Register trust zones, clusters, attestation policies and federations in Connect using Terraform
 
@@ -66,22 +68,22 @@ export TF_VAR_trust_zone_1_name="${WORKLOAD_TRUST_ZONE_1}"
 export TF_VAR_trust_domain_1="${WORKLOAD_TRUST_DOMAIN_1}"
 export TF_VAR_cluster_1_name="${WORKLOAD_K8S_CLUSTER_NAME_1}"
 export TF_VAR_cluster_1_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_1}"
-export TF_VAR_cluster_1_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml)"
+export TF_VAR_cluster_1_extra_helm_values="$(realpath "$SCRIPT_DIR/generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_1}.yaml")"
 
 export TF_VAR_trust_zone_2_name="${WORKLOAD_TRUST_ZONE_2}"
 export TF_VAR_trust_domain_2="${WORKLOAD_TRUST_DOMAIN_2}"
 export TF_VAR_cluster_2_name="${WORKLOAD_K8S_CLUSTER_NAME_2}"
 export TF_VAR_cluster_2_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT_2}"
-export TF_VAR_cluster_2_extra_helm_values="$(realpath generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml)"
+export TF_VAR_cluster_2_extra_helm_values="$(realpath "$SCRIPT_DIR/generated/trust-zone-server-values-${WORKLOAD_TRUST_ZONE_2}.yaml")"
 
 export TF_VAR_attestation_policy_name="${NAMESPACE}-ns-${UNIQUE_ID}"
 export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
-terraform -chdir=./terraform/federated init -input=false -backend=false
+terraform -chdir="$SCRIPT_DIR/terraform/federated" init -input=false -backend=false
 
 ## Ensures that any resources from previous runs have been deleted first.
-terraform -chdir=./terraform/federated destroy -input=false -auto-approve
-terraform -chdir=./terraform/federated apply -input=false -auto-approve
+terraform -chdir="$SCRIPT_DIR/terraform/federated" destroy -input=false -auto-approve
+terraform -chdir="$SCRIPT_DIR/terraform/federated" apply -input=false -auto-approve
 
 # Deploy workload identity infrastructure using cofidectl to generate Helm values.
 
@@ -98,13 +100,13 @@ cofidectl connect init \
 crds_chart_version="0.4.0"
 chart_version="0.21.0"
 chart_repo="https://spiffe.github.io/helm-charts-hardened/"
-values_file_1=generated/spire-values-${WORKLOAD_TRUST_ZONE_1}.yaml
-values_file_2=generated/spire-values-${WORKLOAD_TRUST_ZONE_2}.yaml
+values_file_1="$SCRIPT_DIR/generated/spire-values-${WORKLOAD_TRUST_ZONE_1}.yaml"
+values_file_2="$SCRIPT_DIR/generated/spire-values-${WORKLOAD_TRUST_ZONE_2}.yaml"
 
-./cofidectl trust-zone helm values \
+cofidectl trust-zone helm values \
   $WORKLOAD_TRUST_ZONE_1 --output-file $values_file_1
 
-./cofidectl trust-zone helm values \
+cofidectl trust-zone helm values \
   $WORKLOAD_TRUST_ZONE_2 --output-file $values_file_2
 
 helm upgrade --install spire-crds spire-crds --repo $chart_repo --version $crds_chart_version \
@@ -127,21 +129,21 @@ helm upgrade --install spire spire --repo $chart_repo --version $chart_version \
 
 chart_version=0.1.3
 chart_uri=oci://010438484483.dkr.ecr.eu-west-1.amazonaws.com/cofide/helm-charts/cofide-agent
-values_file_1=generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_1}.yaml
-values_file_2=generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_2}.yaml
+values_file_1="$SCRIPT_DIR/generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_1}.yaml"
+values_file_2="$SCRIPT_DIR/generated/cofide-agent-values-${WORKLOAD_TRUST_ZONE_2}.yaml"
 
-./cofidectl connect agent helm values \
+cofidectl connect agent helm values \
   --trust-zone $WORKLOAD_TRUST_ZONE_1 --cluster $WORKLOAD_K8S_CLUSTER_NAME_1 \
   --output-file $values_file_1 --generate-token=false
 
-./cofidectl connect agent helm values \
+cofidectl connect agent helm values \
   --trust-zone $WORKLOAD_TRUST_ZONE_2 --cluster $WORKLOAD_K8S_CLUSTER_NAME_2 \
   --output-file $values_file_2 --generate-token=false
 
-token_1=$(./cofidectl connect agent join-token generate \
+token_1=$(cofidectl connect agent join-token generate \
   --trust-zone $WORKLOAD_TRUST_ZONE_1 --cluster $WORKLOAD_K8S_CLUSTER_NAME_1 --output-file -)
 
-token_2=$(./cofidectl connect agent join-token generate \
+token_2=$(cofidectl connect agent join-token generate \
   --trust-zone $WORKLOAD_TRUST_ZONE_2 --cluster $WORKLOAD_K8S_CLUSTER_NAME_2 --output-file -)
 
 helm upgrade --install cofide-agent $chart_uri --version $chart_version \
@@ -154,4 +156,4 @@ helm upgrade --install cofide-agent $chart_uri --version $chart_version \
 
 ## Validate the deployment using ping-pong demo
 
-./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+"$SCRIPT_DIR/ping-pong-demo.sh" $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_2

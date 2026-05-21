@@ -2,23 +2,25 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script uses an existing EKS cluster and defines a trust zone, cluster,
 # attestation policy and binding in the staging Connect using cofidectl. It
 # then runs a ping-pong test.
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 ## Deploy workload cluster
 
-source eks.env
+source "$SCRIPT_DIR/eks.env"
 
 # Create an EBS storageclass for SPIRE server.
 
 export AWS_REGION
-envsubst <templates/ebs-storageclass-template.yaml >generated/ebs-storageclass.yaml
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 apply -f generated/ebs-storageclass.yaml
+envsubst <"$SCRIPT_DIR/templates/ebs-storageclass-template.yaml" >"$SCRIPT_DIR/generated/ebs-storageclass.yaml"
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 apply -f "$SCRIPT_DIR/generated/ebs-storageclass.yaml"
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -51,4 +53,4 @@ cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE_1
 
 ## Validate the deployment using ping-pong demo
 
-./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+"$SCRIPT_DIR/ping-pong-demo.sh" $WORKLOAD_K8S_CLUSTER_CONTEXT_1 $WORKLOAD_K8S_CLUSTER_CONTEXT_1

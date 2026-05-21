@@ -4,7 +4,9 @@
 
 set -euxo pipefail
 
-source config.env
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "$SCRIPT_DIR/config.env"
 
 rm -f cofide.yaml
 cofidectl connect init \

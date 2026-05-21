@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script creates a pair of kind clusters with Istio installed, and defines
 # trust zones, clusters, an attestation policy, bindings and federations in the
 # staging Connect using cofidectl with Cofide SPIRE. It then creates a federated
@@ -9,7 +11,7 @@ set -euxo pipefail
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 if ! command -v $HOME/.istioctl/bin/istioctl && ! type istioctl; then
   curl -sL https://istio.io/downloadIstioctl | sh -
@@ -43,9 +45,9 @@ kind delete cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst <templates/kind_workload_config_template.yaml >generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_1 --config generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2 --config generated/kind_workload_config.yaml
+envsubst <"$SCRIPT_DIR/templates/kind_workload_config_template.yaml" >"$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_1 --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME_2 --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
 
 ## Install Istio
 
@@ -55,14 +57,14 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 export HOST_TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_1
 export OTHER_TRUST_DOMAINS="[$WORKLOAD_TRUST_DOMAIN_2]"
 export CLUSTER=$WORKLOAD_K8S_CLUSTER_NAME_1
-envsubst <templates/istio-meshconfig-template.yaml >generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_1.yaml
-istioctl install --skip-confirmation -f generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_1.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+envsubst <"$SCRIPT_DIR/templates/istio-meshconfig-template.yaml" >"$SCRIPT_DIR/generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_1.yaml"
+istioctl install --skip-confirmation -f "$SCRIPT_DIR/generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_1.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
 
 export HOST_TRUST_DOMAIN=$WORKLOAD_TRUST_DOMAIN_2
 export OTHER_TRUST_DOMAINS="[$WORKLOAD_TRUST_DOMAIN_1]"
 export CLUSTER=$WORKLOAD_K8S_CLUSTER_NAME_2
-envsubst <templates/istio-meshconfig-template.yaml >generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_2.yaml
-istioctl install --skip-confirmation -f generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_2.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
+envsubst <"$SCRIPT_DIR/templates/istio-meshconfig-template.yaml" >"$SCRIPT_DIR/generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_2.yaml"
+istioctl install --skip-confirmation -f "$SCRIPT_DIR/generated/istio-meshconfig-$WORKLOAD_TRUST_ZONE_2.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_2
 
 ## Deploy workload identity infrastructure using cofidectl
 
@@ -131,13 +133,13 @@ helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
     --wait
 
 ## Wait for federation to be established
-./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
-./wait_for_federation.sh $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
+"$SCRIPT_DIR/wait_for_federation.sh" $WORKLOAD_TRUST_ZONE_1 $WORKLOAD_TRUST_ZONE_2
+"$SCRIPT_DIR/wait_for_federation.sh" $WORKLOAD_TRUST_ZONE_2 $WORKLOAD_TRUST_ZONE_1
 
 # Create an Istio gateway.
 
-SERVER_TRUST_ZONE=$WORKLOAD_TRUST_ZONE_1 envsubst <templates/gateway-template.yaml >generated/gateway.yaml
-kubectl apply -f generated/gateway.yaml --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
+SERVER_TRUST_ZONE=$WORKLOAD_TRUST_ZONE_1 envsubst <"$SCRIPT_DIR/templates/gateway-template.yaml" >"$SCRIPT_DIR/generated/gateway.yaml"
+kubectl apply -f "$SCRIPT_DIR/generated/gateway.yaml" --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1
 
 # Create a federated service.
 
@@ -146,8 +148,8 @@ export FEDERATED_SERVICE_NAME=server
 export CLIENT_TRUST_ZONE=$WORKLOAD_TRUST_ZONE_2
 export WORKLOAD_LABEL_APP=ping-pong-server
 export SERVER_PORT=8443
-envsubst <templates/federated-service-template.yaml >generated/federated-service.yaml
-kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 apply -f generated/federated-service.yaml
+envsubst <"$SCRIPT_DIR/templates/federated-service-template.yaml" >"$SCRIPT_DIR/generated/federated-service.yaml"
+kubectl --context $WORKLOAD_K8S_CLUSTER_CONTEXT_1 apply -f "$SCRIPT_DIR/generated/federated-service.yaml"
 
 ## Validate the deployment using ping-pong demo
 

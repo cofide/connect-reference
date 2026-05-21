@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # This script creates a kind cluster and defines a trust zone, cluster,
 # attestation policy and binding in the staging Connect using cofidectl
 # and terraform-provider-cofide with Cofide SPIRE. It then runs a
@@ -9,7 +11,7 @@ set -euxo pipefail
 
 # Prerequisites: ./prerequisites.sh
 
-source config.env
+source "$SCRIPT_DIR/config.env"
 
 ## Deploy workload cluster
 
@@ -30,8 +32,8 @@ kind delete cluster --name $WORKLOAD_K8S_CLUSTER_NAME
 # not support ~ or $HOME directly in the extraMounts attribute of the config
 # https://github.com/kubernetes-sigs/kind/issues/3642
 export PATH_TO_HOST_DOCKER_CREDENTIALS=$HOME/.docker/config.json
-envsubst < templates/kind_workload_config_template.yaml > generated/kind_workload_config.yaml
-kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME --config generated/kind_workload_config.yaml
+envsubst < "$SCRIPT_DIR/templates/kind_workload_config_template.yaml" > "$SCRIPT_DIR/generated/kind_workload_config.yaml"
+kind create cluster --name $WORKLOAD_K8S_CLUSTER_NAME --config "$SCRIPT_DIR/generated/kind_workload_config.yaml"
 
 ## Deploy workload identity infrastructure using cofidectl and terraform-provider-cofide
 
@@ -65,11 +67,11 @@ export TF_VAR_cluster_kubernetes_context="${WORKLOAD_K8S_CLUSTER_CONTEXT}"
 export TF_VAR_attestation_policy_name="${NAMESPACE}-ns-${WORKLOAD_TRUST_ZONE}"
 export TF_VAR_attestation_policy_namespace="${NAMESPACE}"
 
-terraform -chdir=./terraform/single-trust-zone init -input=false -backend=false
+terraform -chdir="$SCRIPT_DIR/terraform/single-trust-zone" init -input=false -backend=false
 
 ## Ensures that any resources from previous runs have been deleted first.
-terraform -chdir=./terraform/single-trust-zone destroy -input=false -auto-approve
-terraform -chdir=./terraform/single-trust-zone apply -input=false -auto-approve
+terraform -chdir="$SCRIPT_DIR/terraform/single-trust-zone" destroy -input=false -auto-approve
+terraform -chdir="$SCRIPT_DIR/terraform/single-trust-zone" apply -input=false -auto-approve
 
 cofidectl up --trust-zone $WORKLOAD_TRUST_ZONE
 
@@ -83,4 +85,4 @@ helm upgrade --install cofide-observer cofide/cofide-observer --version 0.3.1 \
 
 ## Validate the deployment using ping-pong demo
 
-./ping-pong-demo.sh $WORKLOAD_K8S_CLUSTER_CONTEXT $WORKLOAD_K8S_CLUSTER_CONTEXT
+"$SCRIPT_DIR/ping-pong-demo.sh" $WORKLOAD_K8S_CLUSTER_CONTEXT $WORKLOAD_K8S_CLUSTER_CONTEXT
