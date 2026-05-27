@@ -1,0 +1,44 @@
+# Optional overrides for the database-iam unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+#
+# IMPORTANT: This unit must be applied before any other database unit that grants
+# rds_iam to any user. Once applied, SSL connections to RDS require IAM token
+# authentication — postgres password auth via SSL is no longer available.
+#
+# Prerequisites before applying this unit:
+#   1. The database_instance unit must be applied.
+#   2. No rds_iam grants must have been made yet (fresh database state).
+#   3. An SSM port-forwarding tunnel to the RDS instance must be open on localhost:5432.
+#      See base/database/rds-instance/README.md for tunnel setup instructions.
+
+locals {
+  # Option A — Secrets Manager (default). Connects as the RDS master user using the
+  # password stored in Secrets Manager. Use this for the initial bootstrap before any
+  # rds_iam grants have been made.
+  # Override the RDS instance identifier (defaults to database_instance unit output).
+  # db_identifier = "my-db"
+
+  # Option B — IAM token auth via SSM tunnel. Use this when re-applying after the
+  # initial bootstrap (when postgres password auth is no longer available).
+  # Set db_actual_host to trigger IAM token generation; db_host stays as localhost.
+  # db_actual_host    = "my-db.xxxx.eu-west-2.rds.amazonaws.com"
+  # db_admin_username = "iam_admin"  # or "postgres" if connecting as the master user
+
+  # Option C — native IAM auth with direct RDS access (no SSM tunnel).
+  # aws_rds_iam_auth  = true
+  # db_host           = "my-db.xxxx.eu-west-2.rds.amazonaws.com"
+  # db_admin_username = "iam_admin"
+
+  # Option D — direct credentials, skips both Secrets Manager and IAM token generation.
+  # Use this for non-RDS or non-IAM databases.
+  # db_username = "myuser"
+  # db_password = "..."
+
+  # Optional: override connection host/port if not using the default SSM tunnel.
+  # db_host = "localhost"
+  # db_port = 5432
+
+  # Optional: override the IAM admin role name.
+  # iam_admin_username = "iam_admin"
+}

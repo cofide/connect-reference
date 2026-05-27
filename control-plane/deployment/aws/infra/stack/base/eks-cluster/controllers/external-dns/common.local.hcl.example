@@ -1,0 +1,25 @@
+# Optional overrides for the external-dns unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+
+locals {
+  # Optional: deploy against an existing cluster instead of the cluster unit output.
+  # cluster_name = "my-cluster"
+
+  # Optional: use an existing Route53 zone instead of the dns unit output.
+  # zone_id = "Z0000000000000000000"
+
+  # Optional: use IRSA instead of EKS Pod Identity.
+  # Requires enable_irsa = true in the cluster unit and oidc_provider_arn to be set.
+  # iam_mode          = "irsa"
+  # oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.eu-west-1.amazonaws.com/id/ABCDEF1234567890"
+
+  # Optional: override IAM resource names.
+  # role_name   = "my-external-dns-role"
+  # policy_name = "my-external-dns-policy"
+
+  # Optional: override the Kubernetes namespace and service account name.
+  # These must match the values used when deploying external-dns via Helm.
+  # namespace            = "external-dns"
+  # service_account_name = "external-dns"
+}

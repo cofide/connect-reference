@@ -1,0 +1,56 @@
+# Optional overrides for the database unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+
+locals {
+  # Optional: provide security group IDs directly instead of using dependency outputs.
+  # node_security_group_id    = "sg-0123456789abcdef0"
+  # jump_security_group_id    = "sg-0123456789abcdef1"
+
+  # Optional: provide networking inputs directly instead of using the networking unit output.
+  # vpc_id      = "vpc-0123456789abcdef0"
+  # subnet_ids  = ["subnet-0123456789abcdef0", "subnet-0123456789abcdef1"]
+
+  # Optional: override RDS resource names.
+  # db_identifier        = "my-db"
+  # subnet_group_name    = "my-db-subnet-group"
+  # security_group_name  = "my-db-rds-sg"
+  # kms_key_alias        = "alias/my-db-rds-storage"
+  # secret_kms_key_alias = "alias/my-db-rds-secret"
+
+  # Optional: override the master username.
+  # db_username = "postgres"
+
+  # Optional: provide the jump unit security group ID directly instead of using the
+  # jump unit dependency. Leave unset to pick it up automatically from the jump unit.
+  # jump_security_group_id = "sg-0123456789abcdef0"
+
+  # Optional: override instance sizing and availability.
+  # db_instance_class     = "db.t3.medium"
+  # postgres_version      = "17"
+  # allocated_storage     = 20
+  # max_allocated_storage = 100   # Production: set a higher ceiling, e.g. 1000.
+  # multi_az              = true  # Production: set to true for high availability.
+
+  # Optional: override backup and maintenance windows (UTC).
+  # backup_window      = "03:00-04:00"
+  # maintenance_window = "mon:04:00-mon:05:00"
+
+  # Production: retain backups for at least 7 days.
+  # backup_retention_period = 7
+
+  # Production: enable Performance Insights with long-term retention (731 days).
+  # performance_insights_enabled          = true
+  # performance_insights_retention_period = 731
+
+  # Production: export logs to CloudWatch for auditing and troubleshooting.
+  # enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  # Production: enable enhanced monitoring at 60-second granularity.
+  # monitoring_interval = 60
+
+  # Recommended for production: enable deletion protection and take a final snapshot on destroy.
+  # skip_final_snapshot       = false
+  # final_snapshot_identifier = "my-db-final-snapshot"
+  # deletion_protection       = true
+}

@@ -1,0 +1,22 @@
+# Configuration for the connect-iam-role unit. Copy to common.local.hcl and
+# fill in the required values.
+
+locals {
+  # REQUIRED: full domain of the SPIRE server OIDC discovery endpoint.
+  # Must match the oidc-subdomain used when deploying the SPIRE server Helm chart.
+  # spire_oidc_domain = "oidc.control-plane-aws-reference.cofide.dev"
+
+  # REQUIRED: SPIFFE ID of the Connect API workload.
+  # For Kubernetes PSAT attestation the format is:
+  #   spiffe://<trust-domain>/ns/<namespace>/sa/<service-account>
+  # spiffe_id = "spiffe://connect-reference/ns/connect/sa/connect-api"
+
+  # Override the IAM role name.
+  # role_name = "cofide-connect-control-plane-aws-reference-arch-connect-api"
+
+  # Override dependency outputs directly if deploying against existing infrastructure.
+  # db_resource_id            = "db-YOURRESOURCEID"
+  # db_username               = "connect_api"
+  # bundle_bucket_arn         = "arn:aws:s3:::my-org-connect-bundles"
+  # bundle_bucket_kms_key_arn = "arn:aws:kms:eu-west-2:123456789012:key/your-key-id"
+}

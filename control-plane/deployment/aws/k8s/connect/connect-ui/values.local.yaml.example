@@ -1,0 +1,26 @@
+# Cluster-specific overrides for the Cofide Connect UI.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+#
+# Where to find each value:
+#   [you] — value you choose or already know
+#   [idp] — from your identity provider configuration
+
+service:
+  annotations:
+    # [you] <ui-subdomain>.<zone> — ExternalDNS creates the DNS record
+    external-dns.alpha.kubernetes.io/hostname: app.example.cofide.dev
+
+ui:
+  # [you] <ui-subdomain>.<zone>
+  hostname: app.example.cofide.dev
+  # [you] https://connect.<zone>
+  connectUrl: https://connect.example.cofide.dev
+  oauth:
+    # [idp] OAuth client ID
+    clientId: my-client-id
+    # [idp] issuer URL
+    issuer: https://auth.example.com
+
+envoy:
+  # Name of the cert-manager-managed TLS secret for the Connect UI domain.
+  tlsSecretName: connect-ui-tls

@@ -1,0 +1,21 @@
+# Helm values for external-dns.
+# https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns
+#
+# Required cluster-specific values (domainFilters, txtOwnerId, region) must be
+# supplied in values.local.yaml. Copy values.local.yaml.example to values.local.yaml
+# and fill in your values.
+
+provider:
+  name: aws
+
+# Manage records for Service and Ingress resources.
+sources:
+  - service
+  - ingress
+
+# upsert-only prevents external-dns from deleting records it did not create.
+# Change to sync once you are confident in the setup.
+policy: upsert-only
+
+# TXT records are used to track which records external-dns owns.
+registry: txt

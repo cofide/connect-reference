@@ -1,0 +1,9 @@
+# Cluster-specific overrides for cert-manager.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+# This file is optional — no overrides are required when using EKS Pod Identity.
+
+# Optional: annotate the service account with an IAM role ARN when using IRSA.
+# Not required when using EKS Pod Identity.
+# serviceAccount:
+#   annotations:
+#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-cert-manager

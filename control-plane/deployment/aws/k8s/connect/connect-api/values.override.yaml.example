@@ -1,0 +1,25 @@
+# Persistent overrides that survive regeneration of values.local.yaml.
+# Copy to values.override.yaml and fill in your values. This file is gitignored.
+# Merged last by install.sh, so it takes precedence over both values.yaml and values.local.yaml.
+
+# Override the image tag, e.g. for a custom build:
+# image:
+#   tag: v0.0.0-my-custom-build
+
+# Override the envoy JWT audience if it differs from the default (https://connect.<urlBase>).
+# Required when the IdP issues tokens with a different audience, e.g. a vanity domain:
+# envoy:
+#   auth:
+#     audiences:
+#       - "https://connect.example.com"
+
+# Bootstrap initial admin users. version must be >= 1 and bumped to re-apply after changes.
+# connect:
+#   initialRBAC:
+#     version: 1
+#     roleBindings:
+#       - roleID: admin
+#         resourceType: System
+#         resourceID: global
+#         user:
+#           subject: "<idp-user-subject-uuid>"

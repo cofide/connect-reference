@@ -1,0 +1,15 @@
+# Helm values for the Cofide Connect API (cofide/cofide-connect chart).
+# https://charts.cofide.dev
+#
+# Cluster-specific values must be supplied in values.local.yaml.
+# Copy values.local.yaml.example to values.local.yaml and fill in your values.
+
+replicaCount: 2
+
+service:
+  port: 443
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: tcp

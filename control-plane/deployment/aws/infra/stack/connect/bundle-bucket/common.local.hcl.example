@@ -1,0 +1,14 @@
+# Configuration for the connect-bundle-bucket unit. Copy to common.local.hcl and
+# fill in the required values.
+
+locals {
+  # REQUIRED: S3 bucket names are globally unique across all AWS accounts.
+  # bucket_name = "my-org-connect-bundles"
+
+  # Override the KMS key alias. Must begin with "alias/".
+  # kms_key_alias = "alias/my-org-connect-bundles"
+
+  # Number of days before a scheduled KMS key deletion takes effect. Valid range: 7–30.
+  # Increase this in production environments to allow more time to recover from accidental deletion.
+  # kms_key_deletion_window_in_days = 7
+}

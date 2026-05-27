@@ -1,0 +1,21 @@
+# Configuration for the connect-bundle-distribution unit. Copy to common.local.hcl
+# and fill in the required values.
+
+locals {
+  # REQUIRED: fully qualified domain name for the trust bundle distribution.
+  # Must be a subdomain of the Route53 zone managed by the base/dns unit.
+  # bundle_domain = "bundles.connect.example.com"
+
+  # CloudFront price class. PriceClass_100 (default) covers US and Europe only.
+  # Use PriceClass_200 or PriceClass_All to serve from more edge locations at higher cost.
+  # price_class = "PriceClass_100"
+
+  # Override the Route53 hosted zone ID instead of reading it from the base/dns dependency.
+  # hosted_zone_id = "Z0YOURHOSTEDZONEID"
+
+  # Override bucket inputs instead of reading them from the connect/bundle-bucket dependency.
+  # Use these when deploying against a bucket created outside this stack.
+  # bucket_name                  = "my-org-connect-bundles"
+  # bucket_arn                   = "arn:aws:s3:::my-org-connect-bundles"
+  # bucket_regional_domain_name  = "my-org-connect-bundles.s3.eu-west-2.amazonaws.com"
+}
