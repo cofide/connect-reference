@@ -20,7 +20,7 @@ variable "namespace" {
   description = "Kubernetes namespace the SPIRE server runs in. Used for the Pod Identity association and IRSA trust condition."
 }
 
-variable "service_account" {
+variable "service_account_name" {
   type        = string
   default     = "spire-server"
   description = "Kubernetes service account name for the SPIRE server. Used for the Pod Identity association and IRSA trust condition."

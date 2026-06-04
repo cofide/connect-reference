@@ -17,6 +17,9 @@ locals {
 
   # Strip the ARN prefix to get the bare OIDC provider URL for IRSA trust conditions.
   oidc_provider_url = var.oidc_provider_arn != null ? trimprefix(var.oidc_provider_arn, "arn:aws:iam::${local.account_id}:oidc-provider/") : null
+
+  # KMS alias prefix used by the SPIRE key manager plugin for all keys it creates.
+  kms_alias_prefix = "arn:aws:kms:${local.region}:${local.account_id}:alias/SPIRE_SERVER*"
 }
 
 # --- Trust policy ---
@@ -46,7 +49,7 @@ data "aws_iam_policy_document" "assume_role" {
       condition {
         test     = "StringEquals"
         variable = "aws:RequestTag/kubernetes-service-account"
-        values   = [var.service_account]
+        values   = [var.service_account_name]
       }
     }
   }
@@ -62,7 +65,7 @@ data "aws_iam_policy_document" "assume_role" {
       condition {
         test     = "StringEquals"
         variable = "${local.oidc_provider_url}:sub"
-        values   = ["system:serviceaccount:${var.namespace}:${var.service_account}"]
+        values   = ["system:serviceaccount:${var.namespace}:${var.service_account_name}"]
       }
       condition {
         test     = "StringEquals"
@@ -114,15 +117,13 @@ data "aws_iam_policy_document" "kms" {
     # Only the alias resource is needed here. CreateKey sets the key policy
     # atomically, so the key-resource side of alias operations is covered by
     # the key policy's kms:* grant to this role.
-    resources = [
-      "arn:aws:kms:${local.region}:${local.account_id}:alias/SPIRE_SERVER*",
-    ]
+    resources = [local.kms_alias_prefix]
   }
 
   statement {
     sid       = "DeleteKeyAliases"
     actions   = ["kms:DeleteAlias"]
-    resources = ["arn:aws:kms:${local.region}:${local.account_id}:alias/SPIRE_SERVER*"]
+    resources = [local.kms_alias_prefix]
   }
 
   # SPIRE's default key policy grants kms:* directly to this role on every key it creates,
@@ -165,6 +166,6 @@ resource "aws_eks_pod_identity_association" "spire_server" {
 
   cluster_name    = var.cluster_name
   namespace       = var.namespace
-  service_account = var.service_account
+  service_account = var.service_account_name
   role_arn        = aws_iam_role.spire_server.arn
 }

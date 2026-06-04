@@ -11,8 +11,8 @@ locals {
   # iam_mode = "irsa"
 
   # Optional: override the Kubernetes namespace and service account.
-  # namespace       = "spire-server"
-  # service_account = "spire-server"
+  # namespace            = "spire-server"
+  # service_account_name = "spire-server"
 
   # Optional: provide dependency values directly instead of reading from unit outputs.
   # Use these when the relevant units have not been deployed via this stack.

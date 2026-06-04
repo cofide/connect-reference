@@ -49,7 +49,7 @@ No modules.
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace the SPIRE server runs in. Used for the Pod Identity association and IRSA trust condition. | `string` | `"spire-server"` | no |
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | ARN of the EKS cluster OIDC provider. Required for IRSA mode. Reads from the cluster unit output when not set. | `string` | `null` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name for the SPIRE server IAM role. | `string` | n/a | yes |
-| <a name="input_service_account"></a> [service\_account](#input\_service\_account) | Kubernetes service account name for the SPIRE server. Used for the Pod Identity association and IRSA trust condition. | `string` | `"spire-server"` | no |
+| <a name="input_service_account_name"></a> [service\_account\_name](#input\_service\_account\_name) | Kubernetes service account name for the SPIRE server. Used for the Pod Identity association and IRSA trust condition. | `string` | `"spire-server"` | no |
 
 ## Outputs
 

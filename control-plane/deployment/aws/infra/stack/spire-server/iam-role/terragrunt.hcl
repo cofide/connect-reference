@@ -33,10 +33,10 @@ dependency "spire_server_database" {
 
 locals {
   default_config = {
-    role_name       = "cofide-connect-control-plane-aws-reference-arch-spire-server"
-    iam_mode        = "pod_identity"
-    namespace       = "spire-server"
-    service_account = "spire-server"
+    role_name            = "cofide-connect-control-plane-aws-reference-arch-spire-server"
+    iam_mode             = "pod_identity"
+    namespace            = "spire-server"
+    service_account_name = "spire-server"
   }
 
   unit_config_path = "${get_terragrunt_dir()}/common.local.hcl"
@@ -55,10 +55,10 @@ terraform {
 }
 
 inputs = {
-  role_name       = local.merged_config.role_name
-  iam_mode        = local.merged_config.iam_mode
-  namespace       = local.merged_config.namespace
-  service_account = local.merged_config.service_account
+  role_name            = local.merged_config.role_name
+  iam_mode             = local.merged_config.iam_mode
+  namespace            = local.merged_config.namespace
+  service_account_name = local.merged_config.service_account_name
 
   cluster_name      = local.user_cluster_name != null ? local.user_cluster_name : try(dependency.cluster.outputs.cluster_name, null)
   oidc_provider_arn = local.user_oidc_provider_arn != null ? local.user_oidc_provider_arn : try(dependency.cluster.outputs.oidc_provider_arn, null)
