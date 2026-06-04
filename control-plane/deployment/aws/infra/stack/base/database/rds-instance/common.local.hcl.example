@@ -1,4 +1,4 @@
-# Optional overrides for the database unit. Copy to common.local.hcl and uncomment
+# Optional overrides for the database/rds-instance unit. Copy to common.local.hcl and uncomment
 # the values you want to change. All fields are optional — omitting a field uses
 # the default defined in terragrunt.hcl.
 
