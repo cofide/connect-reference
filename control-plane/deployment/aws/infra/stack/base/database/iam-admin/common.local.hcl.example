@@ -7,7 +7,7 @@
 # authentication — postgres password auth via SSL is no longer available.
 #
 # Prerequisites before applying this unit:
-#   1. The database_instance unit must be applied.
+#   1. The database/rds-instance unit must be applied.
 #   2. No rds_iam grants must have been made yet (fresh database state).
 #   3. An SSM port-forwarding tunnel to the RDS instance must be open on localhost:5432.
 #      See base/database/rds-instance/README.md for tunnel setup instructions.
