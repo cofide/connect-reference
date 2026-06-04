@@ -1,4 +1,4 @@
-# Configuration for the connect-iam-role unit. Copy to common.local.hcl and
+# Configuration for the connect/iam-role unit. Copy to common.local.hcl and
 # fill in the required values.
 
 locals {
