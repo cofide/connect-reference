@@ -10,6 +10,16 @@ Helm and Kustomize deployment of the Kubernetes workloads for the Connect contro
 
 ---
 
+## Controllers
+
+cert-manager, ExternalDNS, and the AWS Load Balancer Controller handle certificate management, DNS, and ingress in this reference. Any tooling that produces valid TLS certificates and L4 load balancers will work — see [design decisions](../README.md#design-decisions) in the top-level README.
+
+**If these controllers are already running on your cluster with appropriate IAM access to Route53 and your EKS cluster, skip this section.** You will need a cert-manager ClusterIssuer configured for Route53 DNS01 challenges — see [`controllers/README.md`](controllers/README.md) for how to apply one.
+
+If you need to install the controllers from scratch, see [`controllers/README.md`](controllers/README.md).
+
+---
+
 ## SPIRE server
 
 Deploy the SPIRE CRDs and SPIRE server. See [`spire-server/README.md`](spire-server/README.md) for the full steps.
@@ -21,13 +31,3 @@ After the SPIRE OIDC discovery endpoint is publicly reachable, return to [`infra
 ## Connect
 
 Deploy the Connect API and Connect UI. See [`connect/README.md`](connect/README.md) for the full steps.
-
----
-
-## Controllers
-
-cert-manager, ExternalDNS, and the AWS Load Balancer Controller handle certificate management, DNS, and ingress in this reference. Any tooling that produces valid TLS certificates and L4 load balancers will work — see [design decisions](../README.md#design-decisions) in the top-level README.
-
-**If these controllers are already running on your cluster with appropriate IAM access to Route53 and your EKS cluster, skip this section.** You will need a cert-manager ClusterIssuer configured for Route53 DNS01 challenges — see [`controllers/README.md`](controllers/README.md) for how to apply one.
-
-If you need to install the controllers from scratch, see [`controllers/README.md`](controllers/README.md).

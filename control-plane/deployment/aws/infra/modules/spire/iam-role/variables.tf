@@ -46,7 +46,7 @@ variable "oidc_provider_arn" {
 variable "db_resource_id" {
   type        = string
   default     = null
-  description = "RDS DbiResourceId of the database instance. Used to construct the rds-db:connect IAM permission ARN. Reads from the database_instance unit output when not set."
+  description = "RDS DbiResourceId of the database instance. Used to construct the rds-db:connect IAM permission ARN. Reads from the base/database/rds-instance unit output when not set."
 }
 
 variable "db_username" {

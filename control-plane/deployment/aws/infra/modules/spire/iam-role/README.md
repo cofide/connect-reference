@@ -43,7 +43,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | EKS cluster name. Required for Pod Identity association. Reads from the cluster unit output when not set. | `string` | `null` | no |
-| <a name="input_db_resource_id"></a> [db\_resource\_id](#input\_db\_resource\_id) | RDS DbiResourceId of the database instance. Used to construct the rds-db:connect IAM permission ARN. Reads from the database\_instance unit output when not set. | `string` | `null` | no |
+| <a name="input_db_resource_id"></a> [db\_resource\_id](#input\_db\_resource\_id) | RDS DbiResourceId of the database instance. Used to construct the rds-db:connect IAM permission ARN. Reads from the base/database/rds-instance unit output when not set. | `string` | `null` | no |
 | <a name="input_db_username"></a> [db\_username](#input\_db\_username) | PostgreSQL role name for the SPIRE server database user. Used to construct the rds-db:connect IAM permission ARN. Reads from the spire-server-db unit output when not set. | `string` | `null` | no |
 | <a name="input_iam_mode"></a> [iam\_mode](#input\_iam\_mode) | IAM binding mode. 'pod\_identity' uses EKS Pod Identity (requires eks-pod-identity-agent add-on). 'irsa' uses IAM Roles for Service Accounts (requires enable\_irsa = true in the cluster unit and oidc\_provider\_arn to be set). | `string` | `"pod_identity"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace the SPIRE server runs in. Used for the Pod Identity association and IRSA trust condition. | `string` | `"spire-server"` | no |

@@ -16,7 +16,7 @@ locals {
   # Option A — Secrets Manager (default). Connects as the RDS master user using the
   # password stored in Secrets Manager. Use this for the initial bootstrap before any
   # rds_iam grants have been made.
-  # Override the RDS instance identifier (defaults to database_instance unit output).
+  # Override the RDS instance identifier (defaults to base/database/rds-instance unit output).
   # db_identifier = "my-db"
 
   # Option B — IAM token auth via SSM tunnel. Use this when re-applying after the

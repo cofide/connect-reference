@@ -4,8 +4,8 @@
 #
 # Option A (default): connect via IAM token authentication using iam_admin.
 #   Prerequisites:
-#   1. The database_instance unit must be applied.
-#   2. The database-iam unit must be applied (creates the iam_admin role).
+#   1. The base/database/rds-instance unit must be applied.
+#   2. The base/database/iam-admin unit must be applied (creates the iam_admin role).
 #   3. An SSM port-forwarding tunnel must be open on localhost:5432.
 #      See base/database/rds-instance/README.md for tunnel setup instructions.
 #   4. The IAM identity running terragrunt must have rds-db:connect permission
@@ -18,9 +18,9 @@ locals {
   # Option A — IAM token auth via SSM tunnel (default).
   # The provider connects to localhost (tunnel) but tokens are generated for the actual
   # RDS hostname. Requires aws CLI available on the machine running terragrunt.
-  # Override the RDS hostname used for token generation (defaults to database_instance output).
+  # Override the RDS hostname used for token generation (defaults to base/database/rds-instance output).
   # db_actual_host = "my-db.xxxx.eu-west-2.rds.amazonaws.com"
-  # Override the IAM admin username (defaults to database-iam output).
+  # Override the IAM admin username (defaults to base/database/iam-admin output).
   # db_admin_username = "iam_admin"
 
   # Option A (alternative) — IAM token auth with direct RDS access (no SSM tunnel).

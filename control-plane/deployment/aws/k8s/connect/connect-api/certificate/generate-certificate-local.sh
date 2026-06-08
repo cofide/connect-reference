@@ -27,8 +27,6 @@ metadata:
 spec:
   dnsNames:
     - connect.${ZONE_NAME}
-    - connect-agent.${ZONE_NAME}
-    - xds.${ZONE_NAME}
 EOF
 
 echo "Written to ${OUTPUT}."

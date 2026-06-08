@@ -9,5 +9,3 @@ metadata:
 spec:
   dnsNames:
     - connect.example.cofide.dev
-    - connect-agent.example.cofide.dev
-    - xds.example.cofide.dev
