@@ -1,0 +1,7 @@
+locals {
+  aws_account_id = "1234567890"
+  aws_region = "eu-west-2"
+  tf_state_bucket_region = "eu-west-2"
+  tf_state_bucket_name = "example-bucket-name"
+  tf_state_key_prefix = "example-state-key-prefix"
+}

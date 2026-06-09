@@ -1,0 +1,71 @@
+# Cluster-specific overrides for the Cofide Connect API.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+#
+# Where to find each value:
+#   [tf: <unit>: <output>]  — run: terragrunt --working-dir infra/stack/<unit> output -raw <output>
+#   [you]                   — value you choose or already know
+#   [idp]                   — from your identity provider configuration
+
+service:
+  annotations:
+    # ExternalDNS creates records for all three SNI hostnames, all pointing to the same NLB.
+    # [you] connect.<zone>, connect-agent.<zone>, xds.<zone>
+    external-dns.alpha.kubernetes.io/hostname: connect.example.cofide.dev,connect-agent.example.cofide.dev,xds.example.cofide.dev
+
+connect:
+  # urlBase is the base domain; envoy routes connect.<urlBase>, connect-agent.<urlBase>, and xds.<urlBase>.
+  # [you] Route53 hosted zone name
+  urlBase: example.cofide.dev
+  # Origins the Connect UI is served from; required for browser CORS requests.
+  # [you] https://<ui-subdomain>.<zone>
+  allowedOrigins:
+    - "https://app.example.cofide.dev"
+  # [you] SPIRE trust domain — must match global.spire.trustDomain in the SPIRE Helm values
+  trustDomain: connect.example.cofide.dev
+  # URL the trust bundle store is exposed at.
+  # [tf: connect/bundle-distribution: distribution_domain_name] — prefix with https://
+  connectTrustBundleStoreURL: https://abc123.cloudfront.net
+  datastore:
+    sqlConnectionString:
+      enabled: false
+    rds:
+      enabled: true
+      # [you] RDS instance endpoint
+      host: my-rds-instance.abc123.eu-west-2.rds.amazonaws.com
+      port: 5432
+      # [tf: connect/database: connect_db_name] (default: connect)
+      databaseName: connect
+      # [tf: connect/database: connect_db_user] (default: connect_api)
+      dbUser: connect_api
+      oidc:
+        # [you] AWS region
+        awsRegion: eu-west-2
+        # [tf: connect/iam-role: role_arn]
+        iamRoleARN: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-connect-api
+        audience: sts.amazonaws.com
+  trustBundleStoreBackend:
+    s3:
+      enabled: true
+      # [tf: connect/bundle-bucket: bucket_name]
+      bucket: my-trust-bundle-bucket
+      oidc:
+        enabled: true
+        # [you] AWS region
+        awsRegion: eu-west-2
+        # [tf: connect/iam-role: role_arn] (same role as above)
+        iamRoleARN: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-connect-api
+        audience: sts.amazonaws.com
+
+envoy:
+  auth:
+    # [idp] issuer URL
+    issuer: https://auth.example.com
+    # [idp] JWKS endpoint
+    jwksUri: https://auth.example.com/.well-known/jwks.json
+    # Must match the secretName of the certificate created in certificate/.
+    tlsSecretName: connect-tls
+
+# Optional: uncomment to use IRSA instead of EKS Pod Identity.
+# serviceAccount:
+#   annotations:
+#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-connect-api

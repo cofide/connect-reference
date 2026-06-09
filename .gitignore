@@ -9,3 +9,7 @@ terraform.tfstate.backup
 terraform.tfvars
 .terraform
 *.env
+common.local.hcl
+*.local.yaml
+*.override.yaml
+**/.terragrunt-cache/*

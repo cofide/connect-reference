@@ -1,0 +1,20 @@
+# Cluster-specific overrides for external-dns.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+
+# Required: domain name(s) of the Route53 hosted zone(s) external-dns should manage.
+domainFilters:
+  - example.com
+
+# Required: unique identifier written into TXT ownership records so multiple
+# external-dns instances do not conflict. Use the EKS cluster name.
+txtOwnerId: my-cluster
+
+env:
+  - name: AWS_DEFAULT_REGION
+    value: eu-west-1
+
+# Optional: annotate the service account with an IAM role ARN when using IRSA.
+# Not required when using EKS Pod Identity.
+# serviceAccount:
+#   annotations:
+#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-external-dns

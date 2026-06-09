@@ -1,0 +1,10 @@
+# Helm values for cert-manager.
+# https://github.com/cert-manager/cert-manager/tree/master/deploy/charts/cert-manager
+#
+# After installing cert-manager, apply the ClusterIssuer:
+#   kubectl apply -k cluster-issuer/
+# Edit cluster-issuer/cluster-issuer.yaml with your domain, hosted zone, and email first.
+
+# Install cert-manager CRDs as part of the Helm release.
+crds:
+  enabled: true

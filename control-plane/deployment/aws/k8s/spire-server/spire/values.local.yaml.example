@@ -1,0 +1,60 @@
+# Cluster-specific overrides for the Cofide SPIRE server.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+#
+# Where to find each value:
+#   [tf: <unit>: <output>]  — run: terragrunt --working-dir infra/stack/<unit> output -raw <output>
+#   [you]                   — value you choose or already know
+
+global:
+  spire:
+    # [you] EKS cluster name
+    clusterName: my-cluster
+    # [you] SPIRE trust domain (e.g. connect.example.com)
+    trustDomain: connect.example.cofide.dev
+    # [you] https://<oidc-subdomain>.<zone>
+    jwtIssuer: https://oidc-discovery.example.cofide.dev
+    caSubject:
+      # [you] two-letter country code
+      country: GB
+      # [you] organisation name
+      organization: Example
+      # [you] common name for the upstream CA certificate
+      commonName: example.cofide.dev
+
+spiffe-oidc-discovery-provider:
+  service:
+    annotations:
+      # [you] <oidc-subdomain>.<zone> — ExternalDNS creates the DNS record
+      external-dns.alpha.kubernetes.io/hostname: oidc-discovery.example.cofide.dev
+  tls:
+    certManager:
+      certificate:
+        issuerRef:
+          name: letsencrypt
+        dnsNames:
+          # [you] same hostname as above
+          - oidc-discovery.example.cofide.dev
+
+spire-server:
+  dataStore:
+    sql:
+      # [you] AWS region
+      region: eu-west-2
+      # [you] RDS instance endpoint
+      host: my-rds-instance.abc123.eu-west-2.rds.amazonaws.com
+      port: 5432
+      # [tf: spire-server/database: spire_db_name] (default: spire)
+      databaseName: spire
+      # [tf: spire-server/database: spire_db_user] (default: spire)
+      username: spire
+  keyManager:
+    awsKMS:
+      # [you] AWS region
+      region: eu-west-2
+
+# Optional: uncomment to use IRSA instead of EKS Pod Identity.
+# spire-server:
+#   serviceAccount:
+#     annotations:
+#       # [tf: spire-server/iam-role: role_arn]
+#       eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-spire-server

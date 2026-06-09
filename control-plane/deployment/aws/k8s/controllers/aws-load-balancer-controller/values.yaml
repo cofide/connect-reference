@@ -1,0 +1,16 @@
+# Helm values for aws-load-balancer-controller.
+# https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller
+#
+# Required cluster-specific values (clusterName, region, vpcId) must be supplied
+# in values.local.yaml. Copy values.local.yaml.example to values.local.yaml and
+# fill in your values.
+
+replicaCount: 2
+
+# Disable the cluster-specific subnet tag requirement (kubernetes.io/cluster/<name>: shared).
+# With this off, the controller discovers subnets solely via the role tags
+# (kubernetes.io/role/elb and kubernetes.io/role/internal-elb), which allows
+# subnets to be shared across multiple EKS clusters without tagging them for
+# every cluster individually. Requires LBC >= 2.4.2.
+featureGates:
+  SubnetsClusterTagCheck: false

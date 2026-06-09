@@ -1,0 +1,38 @@
+# Optional overrides for the vpc unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+
+locals {
+  # --- VPC ---
+
+  # vpc_cidr = "10.0.0.0/16"
+  # vpc_name = "cofide-connect-control-plane"
+
+  # --- Subnets ---
+  #
+  # Each subnet type is a map keyed by a logical name (used as the Terraform state
+  # identifier, independent of the subnet name). Each entry sets cidr_block,
+  # availability_zone, name, and optional tags.
+  #
+  # Public subnets are routed via the Internet Gateway. The kubernetes.io/role/elb
+  # tag is required for the AWS Load Balancer Controller to provision public NLBs/ALBs.
+  #
+  # private_subnets = {
+  #   "az-a" = {
+  #     cidr_block        = "10.0.32.0/19"
+  #     availability_zone = "eu-west-2a"
+  #     name              = "private-eu-west-2a"
+  #     tags = {
+  #       "kubernetes.io/role/internal-elb" = "1"
+  #     }
+  #   }
+  # }
+
+  # --- Resource names ---
+
+  # internet_gateway_name    = "cofide-connect-control-plane"
+  # nat_gateway_name         = "cofide-connect-control-plane"
+  # public_route_table_name  = "public-cofide-connect-control-plane"
+  # private_route_table_name = "private-cofide-connect-control-plane"
+  # intra_route_table_name   = "intra-cofide-connect-control-plane"
+}

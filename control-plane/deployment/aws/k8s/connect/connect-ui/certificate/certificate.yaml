@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: connect-ui-tls
+  namespace: connect
+spec:
+  secretName: connect-ui-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt
+  dnsNames:
+    - app.example.cofide.dev

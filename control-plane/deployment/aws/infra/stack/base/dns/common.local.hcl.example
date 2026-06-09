@@ -1,0 +1,11 @@
+# Configuration for the dns unit. Copy to common.local.hcl and fill in the required fields.
+
+locals {
+  # Required: the Route53 hosted zone to create.
+  zone_name = "mysubdomain.example.com"
+
+  # Optional: create NS delegation records in a Cloudflare-managed parent zone.
+  # Requires the CLOUDFLARE_API_TOKEN environment variable to be set.
+  # cloudflare_zone_id     = "abc123def456abc123def456abc123de"  # Cloudflare zone ID for the parent domain
+  # cloudflare_record_name = "mysubdomain"                       # subdomain to delegate, relative to the Cloudflare zone
+}

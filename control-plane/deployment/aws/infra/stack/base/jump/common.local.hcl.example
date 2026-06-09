@@ -1,0 +1,17 @@
+# Optional overrides for the jump unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+
+locals {
+  # Optional: deploy into an existing VPC instead of using the networking unit output.
+  # vpc_id    = "vpc-0123456789abcdef0"
+  # subnet_id = "subnet-0123456789abcdef0"
+
+  # Optional: override resource names.
+  # role_name     = "my-jump-role"
+  # sg_name       = "my-jump-sg"
+  # instance_name = "my-jump"
+
+  # Optional: override instance sizing.
+  # instance_type = "t3.micro"
+}

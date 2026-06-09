@@ -1,0 +1,45 @@
+# Optional overrides for the connect/database unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+#
+# Option A (default): connect via IAM token authentication using iam_admin.
+#   Prerequisites:
+#   1. The rds-instance unit must be applied.
+#   2. The iam-admin unit must be applied (creates the iam_admin role).
+#   3. An SSM port-forwarding tunnel must be open on localhost:5432.
+#      See base/database/rds-instance/access.md for tunnel setup instructions.
+#   4. The IAM identity running terragrunt must have rds-db:connect permission
+#      for the iam_admin user on this RDS instance.
+#
+# Option B: connect using direct credentials (non-RDS or non-IAM databases).
+#   Set db_username and db_password to bypass IAM token generation entirely.
+
+locals {
+  # Option A — IAM token auth via SSM tunnel (default).
+  # The provider connects to localhost (tunnel) but tokens are generated for the actual
+  # RDS hostname. Requires aws CLI available on the machine running terragrunt.
+  # Override the RDS hostname used for token generation (defaults to rds-instance output).
+  # db_actual_host = "my-db.xxxx.eu-west-2.rds.amazonaws.com"
+  # Override the IAM admin username (defaults to iam-admin output).
+  # db_admin_username = "iam_admin"
+
+  # Option A (alternative) — IAM token auth with direct RDS access (no SSM tunnel).
+  # The provider connects directly to the RDS endpoint and generates tokens internally.
+  # Set db_host to the actual RDS endpoint and enable native IAM auth.
+  # aws_rds_iam_auth = true
+  # db_host = "my-db.xxxx.eu-west-2.rds.amazonaws.com"
+  # db_admin_username = "iam_admin"
+
+  # Option B — direct credentials, skips IAM token generation entirely.
+  # Use this for non-RDS or non-IAM databases.
+  # db_username = "myuser"
+  # db_password = "mypassword"
+
+  # Override connection host/port if not using the default SSM tunnel.
+  # db_host = "localhost"
+  # db_port = 5432
+
+  # Optional: override the database and role names.
+  # connect_db_name = "connect"
+  # connect_db_user = "connect_api"
+}

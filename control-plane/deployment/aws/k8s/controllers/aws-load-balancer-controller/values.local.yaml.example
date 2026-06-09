@@ -1,0 +1,17 @@
+# Cluster-specific overrides for aws-load-balancer-controller.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+
+# Required: EKS cluster name.
+clusterName: my-cluster
+
+# Required: AWS region.
+region: eu-west-2
+
+# Required: VPC ID for subnet discovery.
+vpcId: vpc-0123456789abcdef0
+
+# Optional: annotate the service account with an IAM role ARN when using IRSA.
+# Not required when using EKS Pod Identity.
+# serviceAccount:
+#   annotations:
+#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-control-plane-aws-reference-arch-alb-controller
