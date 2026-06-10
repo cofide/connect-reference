@@ -1,0 +1,74 @@
+# Optional overrides for the cluster unit. Copy to common.local.hcl and uncomment
+# the values you want to change. All fields are optional — omitting a field uses
+# the default defined in terragrunt.hcl.
+#
+# To deploy into an existing VPC rather than the control-plane networking unit, set
+# vpc_id and private_subnet_ids. When these are present the networking unit dependency
+# is not used.
+
+locals {
+  # --- Cluster access ---
+
+  # Set to "public" to expose the API server endpoint publicly (no SSM tunnel required).
+  # cluster_access_mode = "public"
+
+  # Restrict the public endpoint to known source CIDRs. Only used when cluster_access_mode
+  # is "public". Defaults to unrestricted ("0.0.0.0/0").
+  # public_access_cidrs = ["203.0.113.0/24"]
+
+  # IAM role ARNs to grant cluster-admin access via EKS access entries.
+  # Find your role ARN with:
+  #   aws iam get-role --role-name <role-name> --query Role.Arn --output text
+  # For IAM Identity Center, the role name is visible in `aws sts get-caller-identity`.
+  # cluster_admin_role_arns = [
+  #   "arn:aws:iam::123456789012:role/aws-reserved/sso.amazonaws.com/eu-west-1/AWSReservedSSO_AdministratorAccess_abc123",
+  # ]
+
+  # --- Existing VPC ---
+
+  # vpc_id             = "vpc-0123456789abcdef0"
+  # private_subnet_ids = ["subnet-0123456789abcdef0", "subnet-0123456789abcdef1", "subnet-0123456789abcdef2"]
+
+  # --- IAM mode ---
+
+  # Set to true to enable IAM Roles for Service Accounts (IRSA). Required when any
+  # controller unit uses iam_mode = "irsa". The default Pod Identity mode does not
+  # require this.
+  # enable_irsa = true
+
+  # --- Node groups ---
+
+  # Defaults to a single Graviton3 (ARM64) node group. All components in this reference
+  # deployment support ARM64. To use x86_64 instead, change ami_type and instance_types:
+  # node_groups = {
+  #   workers = {
+  #     name           = "cofide-connect-trust-zone-aws-reference-arch-workers"
+  #     ami_type       = "AL2023_x86_64_STANDARD"
+  #     instance_types = ["m7i.xlarge"]
+  #     subnet_ids     = []
+  #     min_size       = 2
+  #     max_size       = 3
+  #   }
+  # }
+
+  # --- Add-on versions ---
+
+  # Add-on versions must be compatible with cluster_version.
+  # Run: aws eks describe-addon-versions --kubernetes-version <version>
+  # addon_versions = {
+  #   coredns            = "v1.14.2-eksbuild.4"
+  #   kube_proxy         = "v1.35.3-eksbuild.8"
+  #   vpc_cni            = "v1.21.2-eksbuild.2"
+  #   pod_identity_agent = "v1.3.10-eksbuild.3"
+  # }
+
+  # --- Logging ---
+
+  # log_retention_days = 30
+
+  # --- Jump instance ---
+
+  # Optional: provide the jump unit security group ID directly instead of using the
+  # jump unit dependency. Leave unset to pick it up automatically from the jump unit.
+  # jump_security_group_id = "sg-0123456789abcdef0"
+}

@@ -1,0 +1,63 @@
+# Helm values for the Cofide SPIRE server (cofide/spire chart).
+# https://charts.cofide.dev
+#
+# Cluster-specific values must be supplied in values.local.yaml.
+# Copy values.local.yaml.example to values.local.yaml and fill in your values.
+
+global:
+  spire:
+    namespaces:
+      create: true
+    recommendations:
+      enabled: true
+    strictMode: true
+
+spiffe-oidc-discovery-provider:
+  enabled: false
+
+spire-server:
+  image:
+    registry: 010438484483.dkr.ecr.eu-west-1.amazonaws.com
+    repository: cofide/spire-server
+    tag: v1.14.2-cofide.4
+  kind: deployment
+  replicaCount: 2
+  persistence:
+    type: emptyDir
+  dataStore:
+    plugin: connect
+    # databaseType must be non-sqlite3 to pass the chart's deployment-mode guard,
+    # even though the sql plugin is not used here.
+    sql:
+      databaseType: postgres
+  keyManager:
+    awsKMS:
+      enabled: true
+      keyIdentifierFile:
+        enabled: false
+      keyIdentifierValue:
+        enabled: true
+        identifier: "$POD_NAME"
+    disk:
+      enabled: false
+  extraEnv:
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+  upstreamAuthority:
+    certManager:
+      enabled: true
+      rbac:
+        create: true
+      ca:
+        create: true
+  nodeAttestor:
+    k8sPSAT:
+      audience:
+        - spire-server
+  controllerManager:
+    enabled: false
+  telemetry:
+    prometheus:
+      enabled: true

@@ -14,7 +14,11 @@ if [[ ${#missing[@]} -gt 0 ]]; then
   exit 1
 fi
 
-mapfile -t STACK_DIRS < <(find "${SCRIPT_DIR}" -name "root.hcl" -not -path "*/.terragrunt-cache/*" -exec dirname {} \; | sort)
+mapfile -t STACK_DIRS < <(
+  find "${SCRIPT_DIR}/control-plane" "${SCRIPT_DIR}/workload" \
+    -name "root.hcl" -not -path "*/.terragrunt-cache/*" \
+    -exec dirname {} \; | sort
+)
 
 mapfile -t MODULES_DIRS < <(
   for stack_dir in "${STACK_DIRS[@]}"; do
@@ -51,4 +55,7 @@ done
 echo "==> shellcheck: scripts"
 while IFS= read -r script; do
   shellcheck "${script}"
-done < <(find "${SCRIPT_DIR}" -name "*.sh" -not -path "*/.terragrunt-cache/*" | sort)
+done < <(
+  find "${SCRIPT_DIR}/control-plane" "${SCRIPT_DIR}/workload" \
+    -name "*.sh" -not -path "*/.terragrunt-cache/*" | sort
+)
