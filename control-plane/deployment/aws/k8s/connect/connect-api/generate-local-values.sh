@@ -33,7 +33,7 @@ UI_SUBDOMAIN="$3"
 PSAT_AUDIENCE="$4"
 
 echo "Reading trust domain from deployed spire release..."
-TRUST_DOMAIN=$(helm get values spire --namespace spire-mgmt -o json | yq '.global.spire.trustDomain')
+TRUST_DOMAIN=$(helm get values spire --namespace spire-mgmt --all -o json | jq -r '.global.spire.trustDomain')
 echo "  trust_domain: ${TRUST_DOMAIN}"
 
 echo "Reading region from base/eks-cluster/cluster..."

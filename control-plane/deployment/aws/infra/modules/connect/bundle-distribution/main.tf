@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "bundle_bucket_kms" {
 
   statement {
     sid       = "AllowCloudFrontDecrypt"
-    actions   = ["kms:Decrypt", "kms:GenerateDataKey*"]
+    actions   = ["kms:Decrypt"]
     resources = ["*"]
 
     principals {
