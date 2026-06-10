@@ -81,8 +81,8 @@ cp values.override.yaml.example values.override.yaml
 If all base infra units (`base/eks-cluster/cluster`, `base/dns`, `base/database/rds-instance`) have been applied via this Terragrunt stack, you can generate `values.local.yaml` automatically instead:
 
 ```sh
-./generate-local-values.sh <idp-issuer> <idp-jwks-uri> <ui-subdomain>
-# e.g: ./generate-local-values.sh https://auth.example.com https://auth.example.com/.well-known/jwks.json app
+./generate-local-values.sh <idp-issuer> <idp-jwks-uri> <ui-subdomain> <psat-audience>
+# e.g: ./generate-local-values.sh https://auth.example.com https://auth.example.com/.well-known/jwks.json app connect
 ```
 
 ## Connect UI

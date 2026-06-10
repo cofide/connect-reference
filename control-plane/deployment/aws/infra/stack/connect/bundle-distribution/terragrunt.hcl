@@ -20,6 +20,7 @@ dependency "bundle_bucket" {
     bucket_name                 = "mock-connect-bundles"
     bucket_arn                  = "arn:aws:s3:::mock-connect-bundles"
     bucket_regional_domain_name = "mock-connect-bundles.s3.eu-west-2.amazonaws.com"
+    kms_key_arn                 = "arn:aws:kms:eu-west-2:000000000000:key/mock-kms-key-id"
   }
 }
 
@@ -37,6 +38,7 @@ locals {
   user_bucket_name                 = try(local.user_config.bucket_name, null)
   user_bucket_arn                  = try(local.user_config.bucket_arn, null)
   user_bucket_regional_domain_name = try(local.user_config.bucket_regional_domain_name, null)
+  user_bucket_kms_key_arn          = try(local.user_config.bucket_kms_key_arn, null)
 }
 
 terraform {
@@ -51,4 +53,5 @@ inputs = {
   bucket_name                 = local.user_bucket_name != null ? local.user_bucket_name : try(dependency.bundle_bucket.outputs.bucket_name, null)
   bucket_arn                  = local.user_bucket_arn != null ? local.user_bucket_arn : try(dependency.bundle_bucket.outputs.bucket_arn, null)
   bucket_regional_domain_name = local.user_bucket_regional_domain_name != null ? local.user_bucket_regional_domain_name : try(dependency.bundle_bucket.outputs.bucket_regional_domain_name, null)
+  bucket_kms_key_arn          = local.user_bucket_kms_key_arn != null ? local.user_bucket_kms_key_arn : try(dependency.bundle_bucket.outputs.kms_key_arn, null)
 }

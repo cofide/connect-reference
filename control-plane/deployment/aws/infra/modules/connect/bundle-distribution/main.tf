@@ -44,6 +44,53 @@ resource "aws_acm_certificate_validation" "bundle" {
   validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
 }
 
+# --- KMS key policy ---
+
+data "aws_caller_identity" "current" {}
+
+# CloudFront's OAC signs requests to S3 as cloudfront.amazonaws.com. When the
+# bucket uses SSE-KMS, S3 needs to call KMS to decrypt the data key on behalf of
+# the requester, so the KMS key policy must explicitly allow the CloudFront service
+# principal. Without this, S3 returns 403 to CloudFront even though the OAC bucket
+# policy grants s3:GetObject.
+data "aws_iam_policy_document" "bundle_bucket_kms" {
+  count = var.bucket_kms_key_arn != null ? 1 : 0
+
+  statement {
+    sid       = "EnableRootAccountAccess"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  statement {
+    sid       = "AllowCloudFrontDecrypt"
+    actions   = ["kms:Decrypt"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudfront_distribution.bundle.arn]
+    }
+  }
+}
+
+resource "aws_kms_key_policy" "bundle_bucket" {
+  count  = var.bucket_kms_key_arn != null ? 1 : 0
+  key_id = var.bucket_kms_key_arn
+  policy = data.aws_iam_policy_document.bundle_bucket_kms[0].json
+}
+
 # --- CloudFront ---
 
 resource "aws_cloudfront_origin_access_control" "bundle" {
@@ -75,6 +122,13 @@ data "aws_iam_policy_document" "bundle_bucket" {
 resource "aws_s3_bucket_policy" "bundle" {
   bucket = var.bucket_name
   policy = data.aws_iam_policy_document.bundle_bucket.json
+}
+
+resource "aws_s3_object" "not_found" {
+  bucket       = var.bucket_name
+  key          = "404.html"
+  content      = "Not Found"
+  content_type = "text/plain"
 }
 
 resource "aws_cloudfront_distribution" "bundle" {
@@ -115,9 +169,8 @@ resource "aws_cloudfront_distribution" "bundle" {
   custom_error_response {
     # S3 returns 403 (not 404) for missing objects in private buckets to avoid
     # revealing whether keys exist. Map to 404 so callers get a meaningful response.
-    # response_page_path is required alongside response_code by the CloudFront API;
-    # CloudFront falls back to its built-in error page when the path doesn't exist,
-    # which is acceptable since bundle clients only check the status code.
+    # /404.html is created as an aws_s3_object so CloudFront can serve the error page;
+    # if CloudFront cannot fetch the error page it falls back to the raw S3 response.
     error_code            = 403
     response_code         = 404
     response_page_path    = "/404.html"

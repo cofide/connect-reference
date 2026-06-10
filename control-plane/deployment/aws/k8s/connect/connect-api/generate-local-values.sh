@@ -12,26 +12,28 @@
 #
 # Also requires the spire Helm release to be installed in the spire-mgmt namespace.
 #
-# Usage: ./generate-local-values.sh <idp-issuer> <idp-jwks-uri> <ui-subdomain>
-#   idp-issuer:    Issuer URL of the identity provider (e.g. https://auth.example.com)
-#   idp-jwks-uri:  JWKS URI of the identity provider (e.g. https://auth.example.com/.well-known/jwks.json)
-#   ui-subdomain:  Subdomain the Connect UI is served on (e.g. app); used to set the CORS allowed origin
+# Usage: ./generate-local-values.sh <idp-issuer> <idp-jwks-uri> <ui-subdomain> <psat-audience>
+#   idp-issuer:     Issuer URL of the identity provider (e.g. https://auth.example.com)
+#   idp-jwks-uri:   JWKS URI of the identity provider (e.g. https://auth.example.com/.well-known/jwks.json)
+#   ui-subdomain:   Subdomain the Connect UI is served on (e.g. app); used to set the CORS allowed origin
+#   psat-audience:  Expected audience in PSAT tokens sent by Cofide SPIRE servers when registering
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STACK_DIR="${SCRIPT_DIR}/../../../infra/stack"
 
-if [[ $# -lt 3 ]]; then
-  echo "Usage: $(basename "$0") <idp-issuer> <idp-jwks-uri> <ui-subdomain>"
+if [[ $# -lt 4 ]]; then
+  echo "Usage: $(basename "$0") <idp-issuer> <idp-jwks-uri> <ui-subdomain> <psat-audience>"
   exit 1
 fi
 IDP_ISSUER="$1"
 IDP_JWKS_URI="$2"
 UI_SUBDOMAIN="$3"
+PSAT_AUDIENCE="$4"
 
 echo "Reading trust domain from deployed spire release..."
-TRUST_DOMAIN=$(helm get values spire --namespace spire-mgmt -o json | yq '.global.spire.trustDomain')
+TRUST_DOMAIN=$(helm get values spire --namespace spire-mgmt --all -o json | jq -re '.global.spire.trustDomain')
 echo "  trust_domain: ${TRUST_DOMAIN}"
 
 echo "Reading region from base/eks-cluster/cluster..."
@@ -86,6 +88,7 @@ connect:
     - "https://${UI_SUBDOMAIN}.${ZONE_NAME}"
   trustDomain: ${TRUST_DOMAIN}
   connectTrustBundleStoreURL: https://${DISTRIBUTION_DOMAIN}
+  connectPSATAudience: ${PSAT_AUDIENCE}
   datastore:
     sqlConnectionString:
       enabled: false
