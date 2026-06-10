@@ -1,0 +1,21 @@
+# Optional overrides for the spire-server agent-iam-role unit. Copy to common.local.hcl and
+# uncomment the values you want to change. All fields are optional — omitting a field
+# uses the default defined in terragrunt.hcl or reads from the relevant unit output.
+
+locals {
+  # Optional: override the IAM role name.
+  # role_name = "my-spire-agent-role"
+
+  # Optional: switch to IRSA instead of EKS Pod Identity.
+  # Requires enable_irsa = true in the cluster unit and oidc_provider_arn to be set.
+  # iam_mode = "irsa"
+
+  # Optional: override the Kubernetes namespace and service account.
+  # namespace            = "spire-system"
+  # service_account_name = "spire-agent"
+
+  # Optional: provide dependency values directly instead of reading from unit outputs.
+  # Use these when deploying against an existing cluster not provisioned by this stack.
+  # cluster_name      = "my-cluster"
+  # oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/..."  # irsa only
+}

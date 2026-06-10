@@ -1,6 +1,6 @@
 # SPIRE Server Infrastructure
 
-Terraform unit that provisions the AWS resources needed by the SPIRE server on the trust zone workload cluster. Apply this after the cluster unit and before deploying the SPIRE server onto Kubernetes.
+Terraform units that provision the AWS resources needed by the SPIRE server and agent on the trust zone workload cluster. Apply these after the cluster unit and before deploying the SPIRE server onto Kubernetes.
 
 ## Units
 
@@ -12,6 +12,16 @@ SPIRE's default key policy grants `kms:*` directly to the SPIRE server role on e
 
 ```sh
 cd spire-server/iam-role && terragrunt apply
+```
+
+See `common.local.hcl.example` for available configuration overrides, including switching between Pod Identity and IRSA.
+
+### `agent-iam-role/`
+
+Creates the IAM role for the SPIRE agent with Secrets Manager permissions for the `aws_secretsmanager` SVIDStore plugin. The plugin tags every secret it manages with `spire-svid=true`; the policy uses that tag as a condition on all statements rather than a name prefix. `CreateSecret` requires the tag in the request; `DescribeSecret` uses `StringEqualsIfExists` so the plugin can check secret existence before creating; all other operations (`DeleteSecret`, `PutSecretValue`, `RestoreSecret`, `TagResource`) require the tag on the resource.
+
+```sh
+cd spire-server/agent-iam-role && terragrunt apply
 ```
 
 See `common.local.hcl.example` for available configuration overrides, including switching between Pod Identity and IRSA.

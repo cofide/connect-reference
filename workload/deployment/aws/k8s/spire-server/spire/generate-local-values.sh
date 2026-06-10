@@ -6,6 +6,7 @@
 # Requires the following units to have been applied:
 #   infra/stack/eks-cluster/cluster/
 #   infra/stack/spire-server/iam-role/
+#   infra/stack/spire-server/agent-iam-role/
 #   infra/stack/connect/trust-zone/
 #   control-plane/deployment/aws/infra/stack/base/dns/
 #   control-plane/deployment/aws/infra/stack/connect/bundle-distribution/
@@ -43,6 +44,10 @@ echo "  region: ${REGION}"
 echo "Reading IAM role ARN from spire-server/iam-role..."
 ROLE_ARN=$(terragrunt --working-dir "${STACK_DIR}/spire-server/iam-role" output -raw role_arn)
 echo "  role_arn: ${ROLE_ARN}"
+
+echo "Reading agent IAM role ARN from spire-server/agent-iam-role..."
+AGENT_ROLE_ARN=$(terragrunt --working-dir "${STACK_DIR}/spire-server/agent-iam-role" output -raw role_arn)
+echo "  agent_role_arn: ${AGENT_ROLE_ARN}"
 
 echo "Reading zone name from control-plane base/dns..."
 CP_ZONE_NAME=$(terragrunt --working-dir "${CP_STACK_DIR}/base/dns" output -raw zone_name)
@@ -110,11 +115,24 @@ spire-server:
           name: selfsigned
           kind: ClusterIssuer
 
+spire-agent:
+  unsupportedBuiltInPlugins:
+    # Note: the key must be lowercase 'svidstore' (not 'svidStore') to match the chart's
+    # template check, which maps it to the 'SVIDStore' SPIRE plugin section.
+    svidstore:
+      aws_secretsmanager:
+        plugin_data:
+          region: ${REGION}
+
 # Optional: uncomment to use IRSA instead of EKS Pod Identity.
 # spire-server:
 #   serviceAccount:
 #     annotations:
 #       eks.amazonaws.com/role-arn: ${ROLE_ARN}
+# spire-agent:
+#   serviceAccount:
+#     annotations:
+#       eks.amazonaws.com/role-arn: ${AGENT_ROLE_ARN}
 EOF
 
 echo "Written to ${OUTPUT}."

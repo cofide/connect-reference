@@ -57,9 +57,24 @@ spire-server:
           name: selfsigned
           kind: ClusterIssuer
 
+spire-agent:
+  unsupportedBuiltInPlugins:
+    # Note: the key must be lowercase 'svidstore' (not 'svidStore') to match the chart's
+    # template check, which maps it to the 'SVIDStore' SPIRE plugin section.
+    svidstore:
+      aws_secretsmanager:
+        plugin_data:
+          # [tf: eks-cluster/cluster: region]
+          region: eu-west-2
+
 # Optional: uncomment to use IRSA instead of EKS Pod Identity.
 # spire-server:
 #   serviceAccount:
 #     annotations:
 #       # [tf: spire-server/iam-role: role_arn]
 #       eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-trust-zone-aws-reference-arch-spire-server
+# spire-agent:
+#   serviceAccount:
+#     annotations:
+#       # [tf: spire-server/agent-iam-role: role_arn]
+#       eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-trust-zone-aws-reference-arch-spire-agent
