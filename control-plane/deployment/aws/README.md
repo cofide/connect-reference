@@ -110,6 +110,8 @@ Once all four steps are complete, run `print-cofidectl-config.sh` to print the `
 ./print-cofidectl-config.sh
 ```
 
+then run the printed command to initialise your local cofidectl.
+
 cert-manager (with a Route53 DNS01 ClusterIssuer), ExternalDNS, and the AWS Load Balancer Controller must be running on the cluster before step 2. If not already installed, deploy them first — see [`k8s/controllers/README.md`](k8s/controllers/README.md).
 
 Each Terraform unit reads resource IDs from other units in the stack by default. Supply your existing resource IDs in each unit's `common.local.hcl` — see [`infra/stack/README.md`](infra/stack/README.md) for the values to set.

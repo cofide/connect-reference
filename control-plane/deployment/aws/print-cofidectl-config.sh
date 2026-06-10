@@ -26,10 +26,10 @@ echo "Reading bundle distribution domain from connect/bundle-distribution..."
 DIST_DOMAIN=$(terragrunt --working-dir "${STACK_DIR}/connect/bundle-distribution" output -raw distribution_domain_name)
 
 echo "Reading Connect trust domain from deployed spire Helm release..."
-CONNECT_TRUST_DOMAIN=$(helm get values spire --namespace spire-mgmt --all -o json | jq -r '.global.spire.trustDomain')
+CONNECT_TRUST_DOMAIN=$(helm get values spire --namespace spire-mgmt --all -o json | jq -re '.global.spire.trustDomain')
 
 echo "Reading OAuth client ID from deployed connect-ui Helm release..."
-OAUTH_CLIENT_ID=$(helm get values connect-ui --namespace connect --all -o json | jq -r '.ui.oauth.clientId')
+OAUTH_CLIENT_ID=$(helm get values connect-ui --namespace connect --all -o json | jq -re '.ui.oauth.clientId')
 
 echo ""
 echo "Run the following command to initialise cofidectl:"
