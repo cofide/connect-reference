@@ -22,3 +22,8 @@ output "oidc_provider_arn" {
   description = "ARN of the IAM OIDC provider for the cluster. Non-null only when enable_irsa is true."
   value       = var.enable_irsa ? aws_iam_openid_connect_provider.eks[0].arn : null
 }
+
+output "oidc_issuer_url" {
+  description = "OIDC issuer URL for the EKS cluster (e.g. https://oidc.eks.<region>.amazonaws.com/id/<id>)."
+  value       = aws_eks_cluster.this.identity[0].oidc[0].issuer
+}

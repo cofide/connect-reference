@@ -104,6 +104,12 @@ If you already have a VPC, EKS cluster, RDS PostgreSQL instance, and DNS zone, t
 3. **[Connect infrastructure](infra/stack/connect/README.md)** — S3, CloudFront, Connect IAM role, PostgreSQL database and role (`infra/stack/connect/`)
 4. **[Connect API and Connect UI](k8s/connect/README.md)** — Connect API and Connect UI Helm releases and certificates (`k8s/connect/`)
 
+Once all four steps are complete, run `print-cofidectl-config.sh` to print the `cofidectl connect init` command with all values filled in:
+
+```sh
+./print-cofidectl-config.sh
+```
+
 cert-manager (with a Route53 DNS01 ClusterIssuer), ExternalDNS, and the AWS Load Balancer Controller must be running on the cluster before step 2. If not already installed, deploy them first — see [`k8s/controllers/README.md`](k8s/controllers/README.md).
 
 Each Terraform unit reads resource IDs from other units in the stack by default. Supply your existing resource IDs in each unit's `common.local.hcl` — see [`infra/stack/README.md`](infra/stack/README.md) for the values to set.

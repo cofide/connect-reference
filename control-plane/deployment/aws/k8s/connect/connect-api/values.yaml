@@ -6,6 +6,9 @@
 
 replicaCount: 2
 
+serviceAccount:
+  name: cofide-connect-api
+
 service:
   port: 443
   annotations:

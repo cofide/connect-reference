@@ -112,7 +112,7 @@ If your DNS is managed outside Route53, skip `connect/bundle-distribution/` enti
 ```hcl
 locals {
   spire_oidc_domain = "oidc-discovery.example.com"  # must match the SPIRE Helm values
-  spiffe_id         = "spiffe://<trust-domain>/ns/connect/sa/connect-api"
+  spiffe_id         = "spiffe://<trust-domain>/ns/connect/sa/cofide-connect-api"
   db_resource_id    = "db-XXXXXXXXXXXXXXXXXXXX"  # only if bringing your own RDS
 }
 ```

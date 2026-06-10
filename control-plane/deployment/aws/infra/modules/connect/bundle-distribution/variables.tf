@@ -23,6 +23,12 @@ variable "bucket_regional_domain_name" {
   description = "Regional domain name of the trust bundle S3 bucket. Used as the CloudFront origin domain."
 }
 
+variable "bucket_kms_key_arn" {
+  type        = string
+  description = "ARN of the KMS key used to encrypt the trust bundle bucket. When set, a key policy is created granting the CloudFront distribution kms:Decrypt so it can serve encrypted objects."
+  default     = null
+}
+
 variable "price_class" {
   type        = string
   description = "CloudFront price class. PriceClass_100 covers US and Europe only (lowest cost); PriceClass_200 adds more regions; PriceClass_All covers all edge locations."

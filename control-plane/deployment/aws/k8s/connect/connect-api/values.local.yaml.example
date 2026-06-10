@@ -25,6 +25,9 @@ connect:
   # URL the trust bundle store is exposed at.
   # [tf: connect/bundle-distribution: distribution_domain_name] — prefix with https://
   connectTrustBundleStoreURL: https://abc123.cloudfront.net
+  # Expected audience in PSAT tokens sent by Cofide SPIRE servers when registering.
+  # [you]
+  connectPSATAudience: connect
   datastore:
     sqlConnectionString:
       enabled: false

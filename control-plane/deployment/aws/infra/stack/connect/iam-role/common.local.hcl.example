@@ -9,7 +9,7 @@ locals {
   # REQUIRED: SPIFFE ID of the Connect API workload.
   # For Kubernetes PSAT attestation the format is:
   #   spiffe://<trust-domain>/ns/<namespace>/sa/<service-account>
-  # spiffe_id = "spiffe://connect-reference/ns/connect/sa/connect-api"
+  # spiffe_id = "spiffe://connect-reference/ns/connect/sa/cofide-connect-api"
 
   # Override the IAM role name.
   # role_name = "cofide-connect-control-plane-aws-reference-arch-connect-api"

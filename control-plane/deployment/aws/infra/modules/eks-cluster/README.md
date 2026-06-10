@@ -96,6 +96,7 @@ No modules.
 | <a name="output_cluster_endpoint_hostname"></a> [cluster\_endpoint\_hostname](#output\_cluster\_endpoint\_hostname) | EKS API server hostname (without https://) — used as the SSM port forwarding target host |
 | <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | Name of the EKS cluster |
 | <a name="output_node_security_group_id"></a> [node\_security\_group\_id](#output\_node\_security\_group\_id) | ID of the EKS worker node security group. |
+| <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer URL for the EKS cluster (e.g. https://oidc.eks.<region>.amazonaws.com/id/<id>). |
 | <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the IAM OIDC provider for the cluster. Non-null only when enable\_irsa is true. |
 | <a name="output_region"></a> [region](#output\_region) | AWS region in which the EKS cluster is deployed |
 <!-- END_TF_DOCS -->

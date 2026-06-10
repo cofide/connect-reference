@@ -52,7 +52,7 @@ cp common.local.hcl.example common.local.hcl
 terragrunt apply
 ```
 
-`spire_oidc_domain` is the fully-qualified domain of the SPIRE OIDC discovery endpoint (e.g. `oidc-discovery.example.com`). `spiffe_id` is the SPIFFE ID of the Connect API workload (e.g. `spiffe://<trust-domain>/ns/connect/sa/connect-api`).
+`spire_oidc_domain` is the fully-qualified domain of the SPIRE OIDC discovery endpoint (e.g. `oidc-discovery.example.com`). `spiffe_id` is the SPIFFE ID of the Connect API workload (e.g. `spiffe://<trust-domain>/ns/connect/sa/cofide-connect-api`).
 
 ## Alternative trust bundle exposure
 
