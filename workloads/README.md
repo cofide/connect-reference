@@ -1,6 +1,6 @@
 # Connect Reference - Workloads
 
-This repository contains scripts and configuration to create reference deployments of Connect workload clusters.
+This directory contains scripts and configuration to create reference deployments of Connect workload clusters.
 
 ## Access requirements
 
