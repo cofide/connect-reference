@@ -28,17 +28,17 @@ When making changes that affect documentation:
 
 ## Linting and formatting
 
-`control-plane/lint.sh` runs all linting and formatting tools across the control plane:
+`lint.sh` runs all linting and formatting tools across the `control-plane/` and `workload/` directories:
 
 - `terraform fmt` on all Terraform modules and stack units
 - `terragrunt hcl fmt` on all Terragrunt stacks
 - `terraform-docs` on each module, writing output to `README.md` in the module directory. Module-level description prose is written as a `/** ... */` block comment at the very top of `main.tf` — terraform-docs picks this up as the header automatically.
-- `shellcheck` on all shell scripts under `control-plane/`
+- `shellcheck` on all shell scripts under `control-plane/` and `workload/`
 
 Stack roots are discovered via `root.hcl` and module directories are expected to be siblings of each stack root named `modules/`. Running the script requires `terraform`, `terragrunt`, `terraform-docs`, and `shellcheck` to be installed; it will report any missing tools before exiting.
 
 ```sh
-./control-plane/lint.sh
+./lint.sh
 ```
 
 ## Workloads

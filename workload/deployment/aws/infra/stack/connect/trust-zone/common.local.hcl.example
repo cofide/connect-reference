@@ -1,0 +1,14 @@
+locals {
+  # Name for the trust zone in Cofide Connect.
+  trust_zone_name = "connect-trust-zone-aws-reference-arch"
+
+  # SPIFFE trust domain for this trust zone. Required — no default.
+  trust_domain = "trust-zone.example.cofide.dev"
+
+  # Name for the cluster in Cofide Connect.
+  cluster_name = "connect-trust-zone-aws-reference-arch"
+
+  # Optional: override values if not reading from their respective dependency units.
+  # connect_url     = "example.cofide.dev:443"
+  # oidc_issuer_url = "https://oidc.eks.eu-west-2.amazonaws.com/id/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}

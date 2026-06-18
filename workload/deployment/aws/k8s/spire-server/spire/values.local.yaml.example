@@ -1,0 +1,65 @@
+# Cluster-specific overrides for the Cofide SPIRE server.
+# Copy to values.local.yaml and fill in your values. This file is gitignored.
+#
+# Where to find each value:
+#   [tf: <unit>: <output>]     — run: terragrunt --working-dir infra/stack/<unit> output -raw <output>
+#   [cp-tf: <unit>: <output>]  — run: terragrunt --working-dir <control-plane>/infra/stack/<unit> output -raw <output>
+#   [cp-helm: <release>]       — run: helm get values <release> -n spire-mgmt -o json | yq '<path>'
+#   [you]                      — value you choose or already know
+#   [connect]                  — value from the Connect control plane configuration
+
+global:
+  spire:
+    # [tf: connect/trust-zone: cluster_name]
+    clusterName: my-cluster
+    # [tf: connect/trust-zone: trust_domain]
+    trustDomain: trust-zone.example.cofide.dev
+    # [you] OIDC discovery provider URL. If the provider is cluster-internal (ClusterIP),
+    # use its in-cluster service address. If exposed externally, use the public hostname.
+    jwtIssuer: https://spire-spiffe-oidc-discovery-provider.spire-system.svc.cluster.local
+    caSubject:
+      # [you] two-letter country code
+      country: GB
+      # [you] organisation name
+      organization: Example
+      # [you] common name for the upstream CA certificate
+      commonName: example.cofide.dev
+
+spire-server:
+  # Connect datastore configuration.
+  dataStore:
+    connect:
+      # [cp-tf: base/dns: zone_name] → <zone_name>:443 (gRPC address; connect. subdomain is prepended by Cofide SPIRE)
+      url: ""
+      # [cp-helm: spire] .global.spire.trustDomain
+      trustDomain: ""
+      # [cp-tf: connect/bundle-distribution: distribution_domain_name] + [cp-helm: spire] .global.spire.trustDomain
+      # → https://<distribution_domain_name>/<connect_trust_domain>/bundle
+      bundleEndpointURL: ""
+      # [tf: connect/trust-zone: cluster_id]
+      clusterID: ""
+      # [tf: connect/trust-zone: trust_zone_id]
+      trustZoneID: ""
+      auth:
+        method: psat
+        psatExpirationSeconds: 900
+        # [cp-helm: connect] .connect.connectPSATAudience
+        psatAudience: ""
+  keyManager:
+    awsKMS:
+      # [tf: eks-cluster/cluster: region]
+      region: eu-west-2
+  upstreamAuthority:
+    certManager:
+      ca:
+        issuerRef:
+          # Must match the ClusterIssuer name in cert-manager/cluster-issuer/.
+          name: selfsigned
+          kind: ClusterIssuer
+
+# Optional: uncomment to use IRSA instead of EKS Pod Identity.
+# spire-server:
+#   serviceAccount:
+#     annotations:
+#       # [tf: spire-server/iam-role: role_arn]
+#       eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/cofide-connect-trust-zone-aws-reference-arch-spire-server
