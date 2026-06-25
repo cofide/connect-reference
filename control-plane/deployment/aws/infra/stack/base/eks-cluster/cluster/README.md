@@ -30,6 +30,14 @@ Find your current role ARN with:
 aws sts get-caller-identity --query Arn --output text
 ```
 
+If using an assumed-role, then get the permanent IAM role with:
+
+```sh
+aws iam list-roles
+```
+
+and extract the role ARN.
+
 ## Cluster Access
 
 The cluster is deployed with `cluster_access_mode` controlling how the EKS API server is reached. Set this in `common.local.hcl` before applying.
