@@ -18,6 +18,11 @@ variable "cloudflare_record_name" {
 provider "cloudflare" {
   # Configured via the CLOUDFLARE_API_TOKEN environment variable.
   # Only required when cloudflare_zone_id is set in common.local.hcl.
+
+  # Dummy token to avoid init error when no cloudflare resources are being created.
+  # The Cloudflare provider requires the token to be exactly 40 characters long
+  # and contain only a-z, A-Z, 0-9, -, and _.
+  api_token = var.cloudflare_zone_id == null ? "0000000000000000000000000000000000000000" : null
 }
 
 # NS delegation records in the parent Cloudflare zone. Only created when
