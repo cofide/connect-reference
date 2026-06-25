@@ -4,11 +4,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.yaml")
-if [[ -f "${SCRIPT_DIR}/versions.local.yaml" ]]; then
-  CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.local.yaml")
-fi
-
 helm repo add jetstack https://charts.jetstack.io
 helm repo update jetstack
 
@@ -18,7 +13,7 @@ if [[ -f "${SCRIPT_DIR}/values.local.yaml" ]]; then
 fi
 
 helm upgrade --install cert-manager jetstack/cert-manager \
-  --version "${CHART_VERSION}" \
+  --version v1.20.2 \
   --namespace cert-manager \
   --create-namespace \
   -f "${SCRIPT_DIR}/values.yaml" \

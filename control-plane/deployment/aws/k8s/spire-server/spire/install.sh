@@ -4,11 +4,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.yaml")
-if [[ -f "${SCRIPT_DIR}/versions.local.yaml" ]]; then
-  CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.local.yaml")
-fi
-
 if [[ ! -f "${SCRIPT_DIR}/values.local.yaml" ]]; then
   echo "Error: values.local.yaml not found."
   echo "Copy values.local.yaml.example to values.local.yaml and fill in your values."
@@ -23,8 +18,9 @@ fi
 helm repo add cofide https://charts.cofide.dev
 helm repo update cofide
 
+# To find available versions: helm search repo cofide/spire --devel
 helm upgrade --install spire cofide/spire \
-  --version "${CHART_VERSION}" \
+  --version 0.28.3-cofide.3 \
   --namespace spire-mgmt \
   -f "${SCRIPT_DIR}/values.yaml" \
   -f "${SCRIPT_DIR}/values.local.yaml"

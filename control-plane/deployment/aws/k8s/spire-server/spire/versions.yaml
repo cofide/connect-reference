@@ -1,2 +1,0 @@
-# Latest version at time of writing. To find available versions: helm search repo cofide/spire --devel
-chartVersion: 0.28.3-cofide.3

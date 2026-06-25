@@ -2,17 +2,11 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.yaml")
-if [[ -f "${SCRIPT_DIR}/versions.local.yaml" ]]; then
-  CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.local.yaml")
-fi
-
 helm repo add cofide https://charts.cofide.dev
 helm repo update cofide
 
+# To find available versions: helm search repo cofide/spire-crds --devel
 helm upgrade --install spire-crds cofide/spire-crds \
-  --version "${CHART_VERSION}" \
+  --version 0.5.0-cofide.1 \
   --namespace spire-mgmt \
   --create-namespace
