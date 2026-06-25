@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Generates cluster-issuer.local.yaml from the Terragrunt infra stack outputs.
 # Requires the following unit to have been applied:

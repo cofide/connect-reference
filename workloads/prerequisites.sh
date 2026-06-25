@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script performs prerequisites necessary for using Connect and cofidectl.
 

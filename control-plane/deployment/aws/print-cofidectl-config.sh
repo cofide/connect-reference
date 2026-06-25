@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Prints the cofidectl connect init command with values derived from the
 # Connect control plane setup.
