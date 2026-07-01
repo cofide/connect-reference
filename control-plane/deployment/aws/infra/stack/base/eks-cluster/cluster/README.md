@@ -33,6 +33,14 @@ aws sts get-caller-identity --query Arn --output text
 If using an assumed-role (above output is of the form `arn:aws:sts::123456789012:assumed-role/<role-name>/<username>`), then get the role ARN with:
 
 
+```sh
+aws iam get-role \
+    --role-name <role-name> \
+    --query 'Role.Arn' --output text
+```
+
+and add the role ARN to `common.local.hcl`.
+
 ## Cluster Access
 
 The cluster is deployed with `cluster_access_mode` controlling how the EKS API server is reached. Set this in `common.local.hcl` before applying.
