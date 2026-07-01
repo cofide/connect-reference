@@ -19,6 +19,7 @@ resource "aws_kms_alias" "bundle_bucket" {
 
 resource "aws_s3_bucket" "bundle" {
   bucket = var.bucket_name
+  force_destroy = var.force_destroy
 }
 
 resource "aws_s3_bucket_versioning" "bundle" {
