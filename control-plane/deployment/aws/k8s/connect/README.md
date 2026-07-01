@@ -105,3 +105,7 @@ If the `base/dns` Terragrunt unit has been applied, you can generate `values.loc
 ```sh
 ./generate-local-values.sh <ui-subdomain> <oauth-client-id> <oauth-issuer>
 ```
+
+## Accessing Connect
+
+Once deployment steps are complete, run [`print-cofidectl-config.sh`](control-plane/deployment/aws/print-cofidectl-config.sh) to print the `cofidectl connect init` command with all values filled in then run the printed command to initialise your local cofidectl.
