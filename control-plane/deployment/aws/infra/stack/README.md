@@ -54,6 +54,14 @@ cp common.local.hcl.example common.local.hcl
 
 The S3 state bucket must already exist. See [Configuration](#configuration) for the full list of fields.
 
+Once the configuration files are populated, you can use
+
+```sh
+terragrunt run --all --no-auto-approve apply
+```
+
+from a shared parent directory to apply multiple stacks in a single command.
+
 ---
 
 ### Reference base infrastructure
