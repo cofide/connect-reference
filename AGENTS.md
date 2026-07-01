@@ -167,7 +167,7 @@ terragrunt plan
 terragrunt apply
 
 # To deploy all units in dependency order from the stack/ directory:
-terragrunt run-all apply
+terragrunt run --all apply
 ```
 
 Remote state is stored in S3 with locking via the native S3 lock file backend (`use_lockfile = true`). The AWS provider is generated per-unit with `allowed_account_ids` set to prevent accidental cross-account operations.

@@ -1,2 +1,0 @@
-# Override the default chart version. Copy to versions.local.yaml (gitignored).
-# chartVersion: 0.5.0-cofide.1

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Generates values.local.yaml from the Terragrunt infra stack outputs.
 # Requires the following units to have been applied:

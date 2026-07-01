@@ -1,13 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.yaml")
-if [[ -f "${SCRIPT_DIR}/versions.local.yaml" ]]; then
-  CHART_VERSION=$(yq '.chartVersion' "${SCRIPT_DIR}/versions.local.yaml")
-fi
 
 if [[ ! -f "${SCRIPT_DIR}/values.local.yaml" ]]; then
   echo "Error: values.local.yaml not found."
@@ -24,7 +19,7 @@ if [[ -f "${SCRIPT_DIR}/values.override.yaml" ]]; then
 fi
 
 helm upgrade --install connect cofide/cofide-connect \
-  --version "${CHART_VERSION}" \
+  --version 0.20.0 \
   --namespace connect \
   -f "${SCRIPT_DIR}/values.yaml" \
   -f "${SCRIPT_DIR}/values.local.yaml" \

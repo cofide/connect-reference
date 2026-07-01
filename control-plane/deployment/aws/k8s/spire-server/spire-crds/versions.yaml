@@ -1,2 +1,0 @@
-# Latest version at time of writing. To find available versions: helm search repo cofide/spire-crds --devel
-chartVersion: 0.5.0-cofide.1

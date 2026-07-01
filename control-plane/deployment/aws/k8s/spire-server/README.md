@@ -13,10 +13,25 @@ cd spire-server/spire-crds
 
 ## SPIRE server
 
+If all base infra units (`base/eks-cluster/cluster`, `base/dns`, `base/database/rds-instance`) have been applied via this Terragrunt stack, you can generate `values.local.yaml` automatically:
+
+```sh
+./generate-local-values.sh <trust-domain> <oidc-subdomain> <ca-country> <ca-organization> <ca-common-name>
+# e.g: ./generate-local-values.sh connect.example.com oidc-discovery GB "Example Ltd" "Example Ltd SPIRE Root CA"
+```
+
+Otherwise, copy the example file and fill in the values manually:
+
 ```sh
 cd spire-server/spire
 cp values.local.yaml.example values.local.yaml
-# Fill in values — see the table below for where each comes from.
+```
+
+See the table below for where each comes from.
+
+Once the values are populated:
+
+```sh
 ./install.sh
 ```
 
@@ -36,13 +51,6 @@ cp values.local.yaml.example values.local.yaml
 
 The SPIRE server runs as a `Deployment` — each replica creates its own KMS key identified by its pod name via the Kubernetes Downward API, so no persistent storage is required.
 
-If all base infra units (`base/eks-cluster/cluster`, `base/dns`, `base/database/rds-instance`) have been applied via this Terragrunt stack, you can generate `values.local.yaml` automatically instead:
-
-```sh
-./generate-local-values.sh <trust-domain> <oidc-subdomain> <ca-country> <ca-organization> <ca-common-name>
-# e.g: ./generate-local-values.sh connect.example.com oidc-discovery GB "Example Ltd" "Example Ltd SPIRE Root CA"
-```
-
 ## Confirm OIDC endpoint is reachable
 
 Before proceeding, confirm the SPIRE OIDC discovery endpoint is publicly reachable:
@@ -53,4 +61,4 @@ curl https://<oidc-subdomain>.<zone>/.well-known/openid-configuration
 
 This endpoint must respond before the Connect infrastructure can be applied — `connect/iam-role` creates `aws_iam_openid_connect_provider`, which fetches the TLS certificate from this URL at apply time.
 
-**Return to [`infra/stack/README.md`](../infra/stack/README.md) and apply the Connect infrastructure before continuing.**
+**Return to [`infra/stack/README.md`](../../infra/stack/README.md) and apply the Connect infrastructure before continuing.**

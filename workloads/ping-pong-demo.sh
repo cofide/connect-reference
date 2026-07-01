@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euxo pipefail
 
@@ -16,7 +16,7 @@ source "$SCRIPT_DIR/config.env"
 
 SERVER_CTX=${1?Server context}
 CLIENT_CTX=${2?Client context}
- 
+
 kubectl --context $SERVER_CTX create namespace $NAMESPACE || true
 kubectl --context $CLIENT_CTX create namespace $NAMESPACE || true
 

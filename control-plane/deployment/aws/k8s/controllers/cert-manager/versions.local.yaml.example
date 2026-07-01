@@ -1,2 +1,0 @@
-# Override the default chart version. Copy to versions.local.yaml (gitignored).
-# chartVersion: v1.20.2

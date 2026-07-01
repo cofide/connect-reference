@@ -104,7 +104,7 @@ resource "aws_subnet" "private" {
 # It will automatically expand into AZs as needed if workloads in that AZ have a route to the NAT gateway.
 # If no workloads in an AZ require access to the NAT gateway it will reduce back down.
 # This saves on costs (no need to permanently run a NAT gateway for every AZ with a private subnet).
-# If a specific outbound IP list is required then an elastic IP can be pre-provisioned for each Az the gateway may
+# If a specific outbound IP list is required then an elastic IP can be pre-provisioned for each AZ the gateway may
 # expand into.
 #
 # Regional NAT gateways are an AWS managed resource and do not require a public subnet for them to be deployed into,
