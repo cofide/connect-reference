@@ -1,6 +1,6 @@
 # Control Plane Infrastructure
 
-Terragrunt stack that provisions the AWS infrastructure for the Connect control plane. The SPIRE server must be running before the Connect infrastructure can be applied — see [SPIRE infrastructure](#spire-infrastructure) below.
+This directory contains a Terragrunt stack that provisions the AWS infrastructure for the Connect control plane. The SPIRE server must be running before the Connect infrastructure can be applied — see [SPIRE infrastructure](#spire-infrastructure) below.
 
 See [cost.md](cost.md) for estimated monthly running costs.
 
@@ -53,6 +53,66 @@ cp common.local.hcl.example common.local.hcl
 ```
 
 The S3 state bucket must already exist. See [Configuration](#configuration) for the full list of fields.
+
+---
+
+### Reference base infrastructure
+
+*(Skip this section if you have an existing VPC, EKS cluster, and RDS instance.)*
+
+The following units provide a reference implementation for each base infrastructure component. If you do not wish to re-use existing base infrastructure, apply them before the SPIRE and Connect infrastructure below.
+
+#### Base networking
+
+`vpc` and `dns` have no dependencies and can be applied in parallel. `jump` requires `vpc`.
+
+```sh
+cd base/vpc && terragrunt apply
+cd base/dns && terragrunt apply
+cd base/jump && terragrunt apply
+```
+
+#### EKS cluster
+
+The cluster unit creates the EKS control plane, node group, and add-ons. The three controller units only create IAM roles and Pod Identity Associations — the actual controllers are deployed onto Kubernetes in the next step.
+
+```sh
+cd base/eks-cluster/cluster
+cp common.local.hcl.example common.local.hcl
+# Set cluster_admin_role_arns to your IAM role ARN.
+terragrunt apply
+```
+
+The controller units can be applied in parallel after the cluster:
+
+```sh
+cd base/eks-cluster/controllers/aws-load-balancer-controller && terragrunt apply
+cd base/eks-cluster/controllers/cert-manager && terragrunt apply
+cd base/eks-cluster/controllers/external-dns && terragrunt apply
+```
+
+See [`base/eks-cluster/cluster/README.md`](base/eks-cluster/cluster/README.md) for how to access the cluster.
+
+#### Database
+
+`rds-instance` depends on the cluster unit (it adds an egress rule to the EKS node security group) and must be applied after the cluster. `iam-admin` must follow `rds-instance`.
+
+```sh
+cd base/database/rds-instance && terragrunt apply
+cd base/database/iam-admin && terragrunt apply
+```
+
+**Database initialisation order**
+
+*(This section applies to from-scratch deployments using the reference `base/database/` units. If you have an existing RDS instance with an admin role that has `rds_iam` and superuser privileges, skip to `spire-server/database/` and `connect/database/`.)*
+
+Three units manage the database layer and must be applied in order:
+
+1. **`base/database/rds-instance/`** — provisions the RDS instance.
+2. **`base/database/iam-admin/`** — connects as the RDS master user and creates an `iam_admin` PostgreSQL role with `rds_superuser` and `rds_iam`. **This must be applied before any unit that grants `rds_iam` to a database user.** Granting `rds_iam` triggers a `pg_hba.conf` reload that switches all SSL connections to IAM token authentication — after this point the master password can no longer be used over SSL. Subsequent applies of `iam-admin` itself use the `aws rds generate-db-auth-token` path; set `db_actual_host` in the unit's `common.local.hcl` to enable this.
+3. **`spire-server/database/`** and **`connect/database/`** — connect as `iam_admin` using IAM tokens and create the `spire` and `connect` databases and roles.
+
+The SSM tunnel to the database must be open (see [`base/database/rds-instance/README.md`](base/database/rds-instance/README.md)) when applying units 2 and 3. The IAM identity running Terragrunt must have `rds-db:connect` permission for the `iam_admin` user.
 
 ### SPIRE infrastructure
 
@@ -130,67 +190,3 @@ cd connect/bundle-distribution && terragrunt apply  # skip if using alternative 
 cd connect/database && terragrunt apply
 cd connect/iam-role && terragrunt apply
 ```
-
----
-
-### Reference base infrastructure
-
-*(Skip this section if you have an existing VPC, EKS cluster, and RDS instance.)*
-
-The following units provide a reference implementation for each base infrastructure component. Apply them before the SPIRE and Connect infrastructure above.
-
-#### Base networking
-
-`vpc` and `dns` have no dependencies and can be applied in parallel. `jump` requires `vpc`.
-
-```sh
-cd base/vpc && terragrunt apply
-cd base/dns && terragrunt apply
-cd base/jump && terragrunt apply
-```
-
-#### EKS cluster
-
-The cluster unit creates the EKS control plane, node group, and add-ons. The three controller units only create IAM roles and Pod Identity Associations — the actual controllers are deployed onto Kubernetes in the next step.
-
-```sh
-cd base/eks-cluster/cluster
-cp common.local.hcl.example common.local.hcl
-# Set cluster_admin_role_arns to your IAM role ARN.
-terragrunt apply
-```
-
-The controller units can be applied in parallel after the cluster:
-
-```sh
-cd base/eks-cluster/controllers/aws-load-balancer-controller && terragrunt apply
-cd base/eks-cluster/controllers/cert-manager && terragrunt apply
-cd base/eks-cluster/controllers/external-dns && terragrunt apply
-```
-
-See [`base/eks-cluster/cluster/README.md`](base/eks-cluster/cluster/README.md) for how to access the cluster.
-
-#### Database
-
-`rds-instance` depends on the cluster unit (it adds an egress rule to the EKS node security group) and must be applied after the cluster. `iam-admin` must follow `rds-instance`.
-
-```sh
-cd base/database/rds-instance && terragrunt apply
-cd base/database/iam-admin && terragrunt apply
-```
-
-See [Database initialisation order](#database-initialisation-order) for why `iam-admin` must be applied before any unit that creates a PostgreSQL role, and [`base/database/rds-instance/README.md`](base/database/rds-instance/README.md) for how to access the instance.
-
----
-
-## Database initialisation order
-
-*(This section applies to from-scratch deployments using the reference `base/database/` units. If you have an existing RDS instance with an admin role that has `rds_iam` and superuser privileges, skip to `spire-server/database/` and `connect/database/`.)*
-
-Three units manage the database layer and must be applied in order:
-
-1. **`base/database/rds-instance/`** — provisions the RDS instance.
-2. **`base/database/iam-admin/`** — connects as the RDS master user and creates an `iam_admin` PostgreSQL role with `rds_superuser` and `rds_iam`. **This must be applied before any unit that grants `rds_iam` to a database user.** Granting `rds_iam` triggers a `pg_hba.conf` reload that switches all SSL connections to IAM token authentication — after this point the master password can no longer be used over SSL. Subsequent applies of `iam-admin` itself use the `aws rds generate-db-auth-token` path; set `db_actual_host` in the unit's `common.local.hcl` to enable this.
-3. **`spire-server/database/`** and **`connect/database/`** — connect as `iam_admin` using IAM tokens and create the `spire` and `connect` databases and roles.
-
-The SSM tunnel to the database must be open (see [`base/database/rds-instance/README.md`](base/database/rds-instance/README.md)) when applying units 2 and 3. The IAM identity running Terragrunt must have `rds-db:connect` permission for the `iam_admin` user.
