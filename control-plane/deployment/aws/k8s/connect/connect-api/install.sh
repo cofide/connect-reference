@@ -19,7 +19,7 @@ if [[ -f "${SCRIPT_DIR}/values.override.yaml" ]]; then
 fi
 
 helm upgrade --install connect cofide/cofide-connect \
-  --version 0.19.1 \
+  --version 0.20.0 \
   --namespace connect \
   -f "${SCRIPT_DIR}/values.yaml" \
   -f "${SCRIPT_DIR}/values.local.yaml" \

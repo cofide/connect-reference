@@ -30,13 +30,8 @@ Find your current role ARN with:
 aws sts get-caller-identity --query Arn --output text
 ```
 
-If using an assumed-role, then get the permanent IAM role with:
+If using an assumed-role (above output is of the form `arn:aws:sts::123456789012:assumed-role/<role-name>/<username>`), then get the role ARN with:
 
-```sh
-aws iam list-roles
-```
-
-and extract the role ARN.
 
 ## Cluster Access
 
