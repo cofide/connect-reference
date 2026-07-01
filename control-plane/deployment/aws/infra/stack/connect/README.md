@@ -9,9 +9,10 @@ Terraform units that provision the AWS resources needed by the Connect API. Thes
 Creates a KMS-encrypted S3 bucket that the Connect API writes trust bundles to. Has no dependencies and can be applied independently.
 
 ```sh
+cd connect/bundle-bucket 
 cp common.local.hcl.example common.local.hcl
 # Set bucket_name in common.local.hcl
-cd connect/bundle-bucket && terragrunt apply
+terragrunt apply
 ```
 
 ### `bundle-distribution/`
