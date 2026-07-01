@@ -139,9 +139,9 @@ This reference deployment is designed to be easy to bring up and tear down. Befo
 
 To delete a Connect deployment deployed using this reference stack, perform the following actions in order:
 
-1. Edit the ExternalDNS controller's [values.yaml](./k8s/controllers/external-dns/values.yaml) to set `policy: sync`, so that it is able to delete the DNS records it created for SPIRE and Connect load balancers.
+1. Edit the ExternalDNS controller's [values.yaml](./k8s/controllers/external-dns/values.yaml) to set `policy: sync`, so that it is able to delete the DNS records it created for SPIRE and Connect load balancers, then re-run [install.sh](./k8s/controllers/external-dns/install.sh).
 2. Uninstall the Connect API and UI Helm charts: `helm uninstall -n connect connect connect-ui`. ExternalDNS controller should delete the corresponding Route53 DNS records.
-3. Manually delete the contents of the Connect Bundle S3 bucket (or set  `force_destroy = true` in the bundle-bucket [config](./infra/stack/connect/bundle-bucket/common.local.hcl) then run `terragrunt apply && terragrunt destroy` from the `bundle-bucket` directory). This is required because non-empty S3 buckets cannot be deleted by default.
+3. Manually delete the contents of the Connect Bundle S3 bucket (or set `force_destroy = true` in the bundle-bucket [config](./infra/stack/connect/bundle-bucket/common.local.hcl) then run `terragrunt apply && terragrunt destroy` from the `bundle-bucket` directory). This is required because non-empty S3 buckets cannot be deleted by default.
 4. Tear down the Connect Terragrunt stack from the [infra/stack/connect](./infra/stack/connect) directory with `terragrunt run --all --no-auto-approve --filter '!name=database' destroy` (skipping the database unit since the full RDS instance will be deleted later anyway).
 5. Uninstall the SPIRE Helm chart: `helm uninstall -n spire-mgmt spire spire-crds`. ExternalDNS controller should delete the corresponding Route53 DNS records for the OIDC discovery provider.
 6. Tear down the SPIRE IAM role unit by running `terragrunt destroy` from the [infra/stack/spire-server/iam-role](./infra/stack/spire-server/iam-role) directory.
