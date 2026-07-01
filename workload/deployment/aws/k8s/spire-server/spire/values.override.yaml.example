@@ -1,0 +1,8 @@
+# Persistent overrides that survive regeneration of values.local.yaml.
+# Copy to values.override.yaml and fill in your values. This file is gitignored.
+# Merged last by install.sh, so it takes precedence over both values.yaml and values.local.yaml.
+
+# Override the image tag, e.g. for a custom build:
+# spire-server:
+#   image:
+#     tag: v0.0.0-my-custom-build

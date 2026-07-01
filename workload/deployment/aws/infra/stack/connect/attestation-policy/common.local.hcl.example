@@ -1,0 +1,38 @@
+locals {
+  # Name for the attestation policy in Cofide Connect.
+  policy_name = "connect-trust-zone-aws-reference-arch-svidstore"
+
+  # SPIFFE ID path assigned to workloads matching this policy (e.g. ns/<namespace>/sa/<service-account>).
+  # Required — no default.
+  spiffe_id_path = "ns/default/sa/my-app"
+
+  # SPIFFE ID path of the parent node agent. For k8s-psat-attested nodes this follows the pattern
+  # /spire/agent/k8s_psat/<cluster-name>/<node-uid>. Can be derived from the SPIRE server entry list.
+  # Required — no default.
+  parent_id_path = "/spire/agent/k8s_psat/connect-trust-zone-aws-reference-arch/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+
+  # SPIRE selectors used to match workloads to this attestation policy.
+  # Required — no default.
+  selectors = [
+    {
+      type  = "aws_secretsmanager"
+      value = "secretname:my-secret"
+    },
+  ]
+
+  # Optional: override values if not reading from their respective dependency units.
+  # connect_url = "example.cofide.dev:443"
+}
+
+# Note: this unit requires a locally built cofide/cofide provider that includes the store_svid
+# field on the static attestation policy. Configure dev_overrides in ~/.terraformrc to use it:
+#
+#   provider_installation {
+#     dev_overrides {
+#       "cofide/cofide" = "/path/to/built/binary/directory"
+#     }
+#     direct {}
+#   }
+#
+# Build the provider from the terraform-provider-cofide repository (sibling of this repo) with:
+#   go build -o ~/go/bin/terraform-provider-cofide

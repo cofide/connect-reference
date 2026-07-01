@@ -18,9 +18,15 @@ fi
 helm repo add cofide https://charts.cofide.dev
 helm repo update cofide
 
+OVERRIDE_VALUES_ARGS=()
+if [[ -f "${SCRIPT_DIR}/values.override.yaml" ]]; then
+  OVERRIDE_VALUES_ARGS=(-f "${SCRIPT_DIR}/values.override.yaml")
+fi
+
 helm upgrade --install spire cofide/spire \
   --version "${CHART_VERSION}" \
   --namespace spire-mgmt \
   --create-namespace \
   -f "${SCRIPT_DIR}/values.yaml" \
-  -f "${SCRIPT_DIR}/values.local.yaml"
+  -f "${SCRIPT_DIR}/values.local.yaml" \
+  "${OVERRIDE_VALUES_ARGS[@]}"
