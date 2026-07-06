@@ -109,3 +109,5 @@ If the `base/dns` Terragrunt unit has been applied, you can generate `values.loc
 ## Accessing Connect
 
 Once deployment steps are complete, run [`print-cofidectl-config.sh`](../../print-cofidectl-config.sh) to print the `cofidectl connect init` command with all values filled in then run the printed command to initialise your local cofidectl.
+
+If you wish to remove all Connect reference deployment resources from your AWS account, see [Teardown](../../README.md)

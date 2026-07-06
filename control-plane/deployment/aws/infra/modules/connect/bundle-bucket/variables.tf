@@ -22,3 +22,8 @@ variable "kms_key_deletion_window_in_days" {
     error_message = "kms_key_deletion_window_in_days must be between 7 and 30."
   }
 }
+
+variable "force_destroy" {
+  type        = bool
+  description = "Boolean which indicates whether all objects should be deleted from the bucket when the bucket is destroyed."
+}

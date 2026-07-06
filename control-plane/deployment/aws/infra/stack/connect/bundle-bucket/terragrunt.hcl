@@ -7,6 +7,7 @@ locals {
   default_config = {
     kms_key_alias                   = "alias/cofide-connect-control-plane-aws-reference-arch-bundles"
     kms_key_deletion_window_in_days = 7
+    force_destroy                   = false
   }
 
   unit_config_path = "${get_terragrunt_dir()}/common.local.hcl"
@@ -24,4 +25,5 @@ inputs = {
   bucket_name                     = local.user_config.bucket_name
   kms_key_alias                   = local.merged_config.kms_key_alias
   kms_key_deletion_window_in_days = local.merged_config.kms_key_deletion_window_in_days
+  force_destroy                   = local.merged_config.force_destroy
 }

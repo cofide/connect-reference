@@ -5,10 +5,14 @@ locals {
   # REQUIRED: S3 bucket names are globally unique across all AWS accounts.
   # bucket_name = "my-org-connect-bundles"
 
+  # Allow deleting the S3 bucket even if it's not empty
+  # force_destroy = true
+
   # Override the KMS key alias. Must begin with "alias/".
   # kms_key_alias = "alias/my-org-connect-bundles"
 
   # Number of days before a scheduled KMS key deletion takes effect. Valid range: 7–30.
   # Increase this in production environments to allow more time to recover from accidental deletion.
   # kms_key_deletion_window_in_days = 7
+
 }

@@ -13,9 +13,8 @@ sources:
   - service
   - ingress
 
-# upsert-only prevents external-dns from deleting records it did not create.
-# Change to sync once you are confident in the setup.
-policy: upsert-only
+# Allow external-dns to delete records when components are uninstalled
+policy: sync
 
 # TXT records are used to track which records external-dns owns.
 registry: txt
