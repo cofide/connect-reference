@@ -60,10 +60,7 @@ cofidectl connect init \
   --connect-url $CONNECT_URL \
   --connect-trust-domain $CONNECT_TRUST_DOMAIN \
   --connect-bundle-host $CONNECT_BUNDLE_HOST \
-  --oauth-issuer-url https://$AUTHORIZATION_DOMAIN \
-  --oauth-authorization-url https://$AUTHORIZATION_DOMAIN/oauth2/auth \
-  --oauth-token-url https://$AUTHORIZATION_DOMAIN/oauth2/token \
-  --oauth-client-id $AUTHORIZATION_CLIENT_ID \
+  --oauth-client-id $OAUTH_CLIENT_ID \
   --use-join-token
 
 set +x

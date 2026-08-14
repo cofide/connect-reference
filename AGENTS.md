@@ -52,7 +52,7 @@ cp config.env.example config.env   # populate with Connect API details
 ./prerequisites.sh                  # verify tooling and log in
 ```
 
-`config.env` must be populated before running any deployment script. It sets `CONNECT_URL`, `CONNECT_TRUST_DOMAIN`, `CONNECT_BUNDLE_HOST`, `AUTHORIZATION_DOMAIN`, `AUTHORIZATION_CLIENT_ID`, `NAMESPACE`, and `LOCAL`.
+`config.env` must be populated before running any deployment script. It sets `CONNECT_URL`, `CONNECT_TRUST_DOMAIN`, `CONNECT_BUNDLE_HOST`, `OAUTH_CLIENT_ID`, `NAMESPACE`, and `LOCAL`.
 
 ### Running deployments
 
